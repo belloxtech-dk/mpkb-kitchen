@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { FilePen, Lock, RotateCcw, ShieldAlert, ShieldCheck, Trash2 } from "lucide-react";
 import { RISK_STYLE, STATUS_STYLE } from "@/lib/status-styles";
 import { cn } from "@/lib/cn";
 import { useMessages } from "@/lib/i18n/context";
@@ -60,7 +61,11 @@ export function LedgerView() {
         )}
       >
         <div className="flex items-center gap-2.5">
-          <span className={cn("size-2.5 rounded-full", broken ? "bg-fail" : "bg-pass")} />
+          {broken ? (
+            <ShieldAlert className="size-5 shrink-0 text-fail" />
+          ) : (
+            <ShieldCheck className="size-5 shrink-0 text-pass" />
+          )}
           <div>
             <div className={cn("text-sm font-semibold", broken ? "text-fail" : "text-pass")}>
               {broken ? m.ledgerPage.tampered : m.ledgerPage.intact}
@@ -77,16 +82,18 @@ export function LedgerView() {
             type="button"
             onClick={() => act("tamper")}
             disabled={busy || entries.length === 0}
-            className="rounded-lg border border-fail/40 px-3 py-1.5 text-sm text-fail transition hover:bg-fail/10 disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-lg border border-fail/40 px-3 py-1.5 text-sm text-fail transition hover:bg-fail/10 disabled:opacity-40"
           >
+            <FilePen className="size-4" />
             {m.ledgerPage.simulate}
           </button>
           <button
             type="button"
             onClick={() => act("restore")}
             disabled={busy || !broken}
-            className="rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-40"
           >
+            <RotateCcw className="size-4" />
             {m.ledgerPage.restore}
           </button>
         </div>
@@ -123,8 +130,11 @@ export function LedgerView() {
                   <p className="mt-0.5 truncate text-xs text-muted" title={e.detail}>
                     {e.detail}
                   </p>
-                  <div className="mt-1 flex flex-wrap gap-x-3 font-mono text-[10px] text-muted">
-                    <span className={cn(compromised && "text-fail")}>hash {e.hash.slice(0, 12)}…</span>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 font-mono text-[10px] text-muted">
+                    <span className={cn("flex items-center gap-1", compromised && "text-fail")}>
+                      <Lock className="size-2.5 shrink-0" />
+                      {e.hash.slice(0, 12)}…
+                    </span>
                     <span>
                       {m.ledgerPage.prevLabel} {e.prevHash.slice(0, 12)}…
                     </span>
@@ -142,8 +152,9 @@ export function LedgerView() {
           type="button"
           onClick={onReset}
           disabled={busy || entries.length === 0}
-          className="shrink-0 text-xs text-muted underline-offset-2 transition hover:text-fail hover:underline disabled:opacity-40"
+          className="flex shrink-0 items-center gap-1 text-xs text-muted transition hover:text-fail disabled:opacity-40"
         >
+          <Trash2 className="size-3.5" />
           {m.ledgerPage.reset}
         </button>
       </div>

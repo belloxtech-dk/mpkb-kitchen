@@ -1,5 +1,6 @@
 "use client";
 
+import { Building2, ListChecks, ReceiptText, UtensilsCrossed, type LucideIcon } from "lucide-react";
 import { formatIdr, formatNumber, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { useMessages } from "@/lib/i18n/context";
@@ -7,10 +8,13 @@ import type { ProcurementScenario } from "@/schemas/finance";
 
 /** The raw "books" for a day — always visible, before/after the audit. Presentational only. */
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Card({ title, icon: Icon, children }: { title: string; icon: LucideIcon; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border bg-surface p-4">
-      <div className="mb-3 text-xs font-medium tracking-wide text-muted uppercase">{title}</div>
+      <div className="mb-3 flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted uppercase">
+        <Icon className="size-3.5" />
+        {title}
+      </div>
       {children}
     </div>
   );
@@ -27,7 +31,7 @@ export function MealCounts({ scenario }: { scenario: ProcurementScenario }) {
     { label: m.meal.billed, value: mealsBilled, tone: gap > 0 ? "text-fail" : "text-fg" },
   ];
   return (
-    <Card title={m.books.mealCounts}>
+    <Card title={m.books.mealCounts} icon={UtensilsCrossed}>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {rows.map((r) => (
           <div key={r.label} className="rounded-lg border bg-panel p-2.5">
@@ -46,7 +50,7 @@ export function MealCounts({ scenario }: { scenario: ProcurementScenario }) {
 export function LineItemsTable({ scenario }: { scenario: ProcurementScenario }) {
   const m = useMessages();
   return (
-    <Card title={m.books.lineItems}>
+    <Card title={m.books.lineItems} icon={ListChecks}>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-[13px]">
           <thead>
@@ -85,7 +89,7 @@ export function LineItemsTable({ scenario }: { scenario: ProcurementScenario }) 
 export function InvoiceList({ scenario }: { scenario: ProcurementScenario }) {
   const m = useMessages();
   return (
-    <Card title={m.books.invoices}>
+    <Card title={m.books.invoices} icon={ReceiptText}>
       <ul className="space-y-1.5">
         {scenario.invoices.map((inv) => (
           <li key={inv.id} className="flex items-center justify-between gap-2 rounded-lg border bg-panel px-3 py-2 text-[13px]">
@@ -106,7 +110,7 @@ export function SupplierAwards({ scenario }: { scenario: ProcurementScenario }) 
   const m = useMessages();
   const total = scenario.awards.reduce((sum, a) => sum + a.awards, 0) || 1;
   return (
-    <Card title={m.books.awards}>
+    <Card title={m.books.awards} icon={Building2}>
       <div className="space-y-2">
         {scenario.awards.map((a) => {
           const share = a.awards / total;

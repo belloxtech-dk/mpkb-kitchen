@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useMessages } from "@/lib/i18n/context";
 import { LocaleToggle } from "./locale-toggle";
@@ -68,9 +69,10 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
           <button
             type="button"
             onClick={handleSignOut}
-            className="rounded-lg border px-2 py-1 text-xs text-muted transition hover:text-fg"
+            className="flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs text-muted transition hover:text-fg"
           >
-            {m.auth.signOut}
+            <LogOut className="size-3.5" />
+            <span className="hidden sm:inline">{m.auth.signOut}</span>
           </button>
         </div>
       </div>

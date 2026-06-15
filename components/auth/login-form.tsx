@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { z } from "zod";
+import { CheckCircle2, Send } from "lucide-react";
 import { useMessages } from "@/lib/i18n/context";
 import { authClient } from "@/lib/auth-client";
 
@@ -29,6 +30,7 @@ export function LoginForm() {
   if (status === "sent") {
     return (
       <div className="rounded-xl border border-pass/30 bg-pass-soft p-4 text-center">
+        <CheckCircle2 className="mx-auto mb-1.5 size-6 text-pass" />
         <div className="text-sm font-semibold text-pass">{m.auth.checkEmailTitle}</div>
         <p className="mt-1 text-[13px] text-fg">{m.auth.checkEmailBody}</p>
       </div>
@@ -55,8 +57,9 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-50"
       >
+        <Send className="size-4" />
         {status === "sending" ? m.auth.sending : m.auth.sendLink}
       </button>
     </form>

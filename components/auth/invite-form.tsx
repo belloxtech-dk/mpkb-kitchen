@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { UserPlus } from "lucide-react";
 import { useMessages } from "@/lib/i18n/context";
 import { cn } from "@/lib/cn";
 import type { Role } from "@/lib/auth/roles";
@@ -77,8 +78,9 @@ export function InviteForm({ allowedRoles }: { allowedRoles: Role[] }) {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-50"
+        className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-50"
       >
+        <UserPlus className="size-4" />
         {status === "sending" ? m.auth.inviting : m.auth.invite}
       </button>
       {message && (

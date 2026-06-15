@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Building2, ChevronDown, Lock, Search } from "lucide-react";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { useMessages } from "@/lib/i18n/context";
@@ -34,27 +35,33 @@ export function FleetBar() {
     <div className="border-b bg-panel/60">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-1.5 sm:px-6">
         <div className="relative">
+          {/* trigger styled as a select control so the chevron clearly reads as a dropdown */}
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="flex items-center gap-2 rounded-lg px-2 py-1 text-sm transition hover:bg-surface"
+            aria-haspopup="listbox"
+            aria-expanded={open}
+            className="flex items-center gap-2 rounded-lg border bg-surface px-2.5 py-1 text-sm transition hover:border-accent"
           >
-            <span className="size-2 rounded-full bg-pass" />
+            <span className="size-2 shrink-0 rounded-full bg-pass" />
             <span className="font-medium">{pilot.label}</span>
-            <span className="text-xs text-muted">▾</span>
+            <ChevronDown className={cn("size-4 shrink-0 text-muted transition-transform", open && "rotate-180")} />
           </button>
 
           {open && (
             <>
               <button aria-hidden tabIndex={-1} className="fixed inset-0 z-30 cursor-default" onClick={close} />
               <div className="absolute left-0 z-40 mt-1 w-80 rounded-xl border bg-surface p-2 shadow-lg">
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={m.fleet.searchPlaceholder}
-                  autoFocus
-                  className="w-full rounded-lg border bg-panel px-2.5 py-1.5 text-sm outline-none focus:border-accent"
-                />
+                <div className="relative">
+                  <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted" />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={m.fleet.searchPlaceholder}
+                    autoFocus
+                    className="w-full rounded-lg border bg-panel py-1.5 pr-2.5 pl-8 text-sm outline-none focus:border-accent"
+                  />
+                </div>
                 <div className="px-1 py-1.5 text-[11px] text-muted">
                   {m.fleet.scaleLine(formatNumber(FLEET_STATS.registered), String(FLEET_STATS.provinces))}
                 </div>
@@ -89,9 +96,12 @@ export function FleetBar() {
                         onClick={() => setLockedTried(true)}
                         className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-2 text-left transition hover:bg-panel"
                       >
-                        <span className="min-w-0">
-                          <span className="block truncate text-[13px] text-muted">🔒 {k.label}</span>
-                          <span className="mt-0.5 block truncate text-[11px] text-muted">{k.province}</span>
+                        <span className="flex min-w-0 items-center gap-1.5">
+                          <Lock className="size-3 shrink-0 text-muted" />
+                          <span className="min-w-0">
+                            <span className="block truncate text-[13px] text-muted">{k.label}</span>
+                            <span className="mt-0.5 block truncate text-[11px] text-muted">{k.province}</span>
+                          </span>
                         </span>
                         <span className="shrink-0 text-[10px] text-muted">{m.fleet.notActive}</span>
                       </button>
@@ -109,11 +119,14 @@ export function FleetBar() {
           )}
         </div>
 
-        <div className="text-xs text-muted">
-          <span className="font-mono text-fg">
-            {formatNumber(FLEET_STATS.live)} / {formatNumber(FLEET_STATS.registered)}
-          </span>{" "}
-          {m.fleet.activeLabel}
+        <div className="flex items-center gap-1.5 text-xs text-muted">
+          <Building2 className="size-3.5 shrink-0" />
+          <span>
+            <span className="font-mono text-fg">
+              {formatNumber(FLEET_STATS.live)} / {formatNumber(FLEET_STATS.registered)}
+            </span>{" "}
+            {m.fleet.activeLabel}
+          </span>
         </div>
       </div>
     </div>

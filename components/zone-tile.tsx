@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { ImagePlus } from "lucide-react";
 import { STATUS_STYLE } from "@/lib/status-styles";
 import { cn } from "@/lib/cn";
 import { useMessages } from "@/lib/i18n/context";
@@ -73,9 +74,9 @@ export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnal
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="flex size-full flex-col items-center justify-center gap-1 text-center text-muted transition hover:text-accent"
+            className="flex size-full flex-col items-center justify-center gap-1.5 text-center text-muted transition hover:text-accent"
           >
-            <span className="text-2xl">＋</span>
+            <ImagePlus className="size-6" />
             <span className="text-xs">{m.zone.addHint}</span>
           </button>
         )}

@@ -1,3 +1,4 @@
+import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 /** Renders Claude's live narration as it streams in. */
@@ -17,8 +18,8 @@ export function ReasoningStream({
   const empty = text.length === 0;
   return (
     <div className="rounded-xl border bg-surface p-4">
-      <div className="mb-2 flex items-center gap-2 text-xs font-medium tracking-wide text-muted uppercase">
-        <span className={cn("size-1.5 rounded-full", active ? "bg-accent" : "bg-border")} />
+      <div className="mb-2 flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted uppercase">
+        <Sparkles className={cn("size-3.5", active ? "text-accent" : "text-muted")} />
         {label}
       </div>
       <p

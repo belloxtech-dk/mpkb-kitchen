@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FileSearch } from "lucide-react";
 import { SCENARIOS } from "@/lib/finance/scenarios";
 import { useAudit } from "@/lib/use-audit";
 import { useLocale, useMessages } from "@/lib/i18n/context";
@@ -42,8 +43,9 @@ export function BooksDashboard() {
           type="button"
           onClick={() => audit.run(scenario.id, locale)}
           disabled={auditing}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-40"
+          className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-40"
         >
+          <FileSearch className="size-4" />
           {auditing ? m.books.auditing : m.books.audit}
         </button>
       </div>

@@ -5,6 +5,7 @@ import { ZoneTile } from "./zone-tile";
 import { ReasoningStream } from "./reasoning-stream";
 import { VerdictPanel } from "./verdict-panel";
 import { AlertCard } from "./alert-card";
+import { ScanLine } from "lucide-react";
 import { framesForZone, loadManifest, type ZoneDef } from "@/lib/frames";
 import { fileToImage, urlToImage, type LoadedImage } from "@/lib/image-client";
 import { useAnalysis, type AnalysisInput } from "@/lib/use-analysis";
@@ -114,8 +115,9 @@ export function KitchenMonitor() {
           type="button"
           onClick={runSweep}
           disabled={busy || !hasImages}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-40"
+          className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-40"
         >
+          <ScanLine className="size-4" />
           {busy ? m.floor.sweeping : m.floor.runSweep}
         </button>
       </div>
