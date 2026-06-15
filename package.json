@@ -16,6 +16,9 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "sharp"
+    ],
+    "ignoredOptionalDependencies": [
+      "better-sqlite3"
     ]
   },
   "dependencies": {

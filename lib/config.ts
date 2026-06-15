@@ -5,7 +5,7 @@ import { z } from "zod";
  *
  * Split into two concerns so DB tooling (drizzle-kit, migrate, seed) never
  * needs the Anthropic key:
- *  - `dbFileName`  — always available, safe default.
+ *  - `databaseUrl` — always available, safe default.
  *  - `getEnv()`    — full, validated server env; lazy + memoized so it only
  *                    throws when a feature that needs it (vision, telegram) runs.
  */

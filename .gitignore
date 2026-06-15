@@ -30,12 +30,6 @@ next-env.d.ts
 .env.production.local
 # .env.example IS tracked (it's the template)
 
-# ─── Database (regenerated from migrations + seed) ──────────────
-*.db
-*.db-journal
-*.db-wal
-*.db-shm
-
 # ─── Logs ───────────────────────────────────────────────────────
 *.log
 npm-debug.log*

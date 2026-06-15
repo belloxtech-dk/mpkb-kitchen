@@ -49,7 +49,7 @@ The wow = **streaming Claude's actual observations in real time** (show the reas
 ### Build notes
 - **Stream** Claude responses (SSE/WebSocket) so reasoning visibly types out — ~80% of the wow.
 - Structured verdicts via tool-use / JSON schema drive the checklist + overlays.
-- Tamper-evident ledger = SQLite + ~50 lines of hash-chaining (don't adopt a library).
+- Tamper-evident ledger = hash-chained rows in Postgres + ~50 lines of hashing (don't adopt a library).
 - Telegram bot (~20 lines TS) for the real phone alert; skip WhatsApp setup for the demo.
 - Use the latest capable Claude model for vision + reasoning.
 - Rough plan: Day 1 = scaffold + Act 1 streaming vision. Day 2 = Act 2 upload + Act 3 financials.
@@ -114,7 +114,7 @@ user-facing strings. Established pattern (keep DRY/SSOT):
 
 ## Stack (as built)
 TypeScript throughout. **Next.js 16 (App Router, Turbopack) · React 19 · Tailwind CSS v4 (CSS-first
-`@theme`) · Drizzle ORM + drizzle-kit + better-sqlite3 (SQLite) · Zod 4 · Anthropic TS SDK** (streaming +
+`@theme`) · Drizzle ORM + drizzle-kit + node-postgres (PostgreSQL) · Zod 4 · Anthropic TS SDK** (streaming +
 vision + tool-use). Model via `ANTHROPIC_MODEL` env (default `claude-sonnet-4-6` for dev; swap to an Opus
 id for the real demo). Telegram alert optional via env.
 
@@ -123,7 +123,9 @@ This machine has no global `node`/`npm`; Node lives under nvm. For every shell c
 `export PATH="$HOME/.nvm/versions/node/v22.22.3/bin:$PATH"` (pinned in `.nvmrc`). `pnpm` is the package
 manager. Then:
 1. Create `.env.local` from `.env.example` and add `ANTHROPIC_API_KEY` (Jason provides a project key).
-2. `pnpm install` → `pnpm db:migrate` (creates `mpkb.db`) → `pnpm dev`.
+2. `pnpm install`; ensure Postgres is running and create the DB (`createdb mpkb_kitchen`); set `DATABASE_URL`
+   in `.env.local` if it isn't `postgresql://localhost:5432/mpkb_kitchen` (the default). Then `pnpm db:migrate`
+   (creates the tables; reads `.env.local`) → `pnpm dev`.
 3. Open the app, drop a kitchen photo on a zone tile (or click Add frame) → watch Claude narrate and the
    SOP checklist fill in. "Run sweep" analyzes all populated zones.
 - Staged auto-cycling: drop photos into `public/frames/` and list them in `public/frames/manifest.json`.
@@ -155,9 +157,11 @@ manager. Then:
   Verified live: tamper broke seq 8, restore returned to ok. `getLedgerState/tamperLedger/restoreLedger`
   in `db/repo.ts`; `/api/ledger` GET/POST; `components/ledger/ledger-view.tsx`.
 - ⬜ Act 2 — dedicated "shoot a fresh photo" moment (mostly covered by Act 1 upload). Low priority.
-- ⬜ Demo hardening (next): harden the Act 1 drop zone (non-file drops); add a "reset demo data" control
-  (the ledger accumulates test entries — `rm mpkb.db && pnpm db:migrate` clears it for now); wire a real
-  Telegram alert if creds provided.
+- ✅ Demo hardening: Act 1 drop zone hardened (non-file drops); "Reset demo data" control on the Ledger
+  tab (clears events/finance/ledger via `TRUNCATE … RESTART IDENTITY`); fleet context bar (multi-kitchen
+  illusion). ⬜ still: wire a real Telegram alert if creds provided.
+- ✅ Push 1: migrated SQLite → PostgreSQL (pg + drizzle node-postgres; repo is async). Push 2 (Better Auth:
+  invite-only, superadmin/admin/user, magic-link) is planned next on the Postgres base.
 - ⬜ Polish: swap model to Opus for the demo; visual pass; Andrea's real photos + procurement numbers.
 
 ## Architecture note (applies to all acts)
