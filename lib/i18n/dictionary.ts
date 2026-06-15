@@ -11,7 +11,7 @@ const en = {
   brand: "MPKB · Kitchen Integrity",
   poweredBy: "Powered by Claude",
 
-  nav: { floor: "Floor", books: "Books" },
+  nav: { floor: "Floor", books: "Books", ledger: "Ledger" },
 
   status: { pass: "PASS", warn: "WARN", fail: "FAIL" },
   severity: { low: "LOW", medium: "MEDIUM", high: "HIGH" },
@@ -103,6 +103,27 @@ const en = {
     supplier_concentration: "Supplier concentration",
   },
 
+  ledgerPage: {
+    title: "The Ledger — tamper-evident audit trail",
+    subtitle:
+      "Every AI judgement — kitchen and financial — is sealed into an append-only, hash-chained ledger. Alter any past record and the chain breaks.",
+    intact: "Chain intact — all records verified",
+    tampered: "TAMPER DETECTED",
+    tamperedAt: (seq: number) => `Record #${seq} was altered after it was sealed`,
+    reasonAltered: "content no longer matches its seal",
+    simulate: "Simulate tampering",
+    restore: "Restore",
+    empty: "No sealed records yet — run an inspection on the Floor or an audit in the Books first.",
+    colSeq: "#",
+    colTime: "Time",
+    colSource: "Source",
+    colRecord: "Record",
+    kindSop: "Kitchen SOP",
+    kindFinance: "Finance audit",
+    prevLabel: "prev",
+    note: "Each record's hash is computed from its content and the previous record's hash. Editing a sealed record changes its hash and breaks every link after it.",
+  },
+
   // Used server-side by the reconciliation engine.
   finance: {
     titles: {
@@ -137,7 +158,7 @@ const id: Messages = {
   brand: "MPKB · Integritas Dapur",
   poweredBy: "Didukung oleh Claude",
 
-  nav: { floor: "Dapur", books: "Keuangan" },
+  nav: { floor: "Dapur", books: "Keuangan", ledger: "Buku Besar" },
 
   status: { pass: "LULUS", warn: "PERINGATAN", fail: "GAGAL" },
   severity: { low: "RENDAH", medium: "SEDANG", high: "TINGGI" },
@@ -228,6 +249,27 @@ const id: Messages = {
     duplicate_invoice: "Faktur ganda",
     threshold_gaming: "Manipulasi ambang",
     supplier_concentration: "Konsentrasi pemasok",
+  },
+
+  ledgerPage: {
+    title: "Buku Besar — Jejak Audit Anti-Manipulasi",
+    subtitle:
+      "Setiap penilaian AI — dapur dan keuangan — disegel ke dalam buku besar berantai-hash yang hanya bisa ditambah. Ubah satu catatan lama dan rantainya rusak.",
+    intact: "Rantai utuh — semua catatan terverifikasi",
+    tampered: "MANIPULASI TERDETEKSI",
+    tamperedAt: (seq: number) => `Catatan #${seq} diubah setelah disegel`,
+    reasonAltered: "konten tidak lagi cocok dengan segelnya",
+    simulate: "Simulasikan manipulasi",
+    restore: "Pulihkan",
+    empty: "Belum ada catatan tersegel — jalankan inspeksi di Dapur atau audit di Keuangan terlebih dahulu.",
+    colSeq: "#",
+    colTime: "Waktu",
+    colSource: "Sumber",
+    colRecord: "Catatan",
+    kindSop: "SOP Dapur",
+    kindFinance: "Audit keuangan",
+    prevLabel: "sebelumnya",
+    note: "Hash setiap catatan dihitung dari isinya dan hash catatan sebelumnya. Mengubah catatan tersegel mengubah hash-nya dan memutus setiap tautan setelahnya.",
   },
 
   finance: {

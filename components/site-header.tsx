@@ -15,6 +15,7 @@ export function SiteHeader() {
   const tabs = [
     { href: "/", label: m.nav.floor },
     { href: "/books", label: m.nav.books },
+    { href: "/ledger", label: m.nav.ledger },
   ];
 
   return (

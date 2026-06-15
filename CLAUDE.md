@@ -148,10 +148,17 @@ manager. Then:
   Verified live: flagged scenario computes Rp 12.434.000 leakage, AI returns critical risk, ledger sealed.
   Synthetic scenarios in `lib/finance/scenarios.ts` (one flagged, one clean control) — swap in Andrea's
   real numbers later.
+- ✅ Act 4 — `/ledger`: tamper-evident audit trail. Lists the hash chain (SOP + finance), a verify banner,
+  and a live "Simulate tampering" → flips a sealed record (e.g. finance risk critical→low to look clean) →
+  `verifyLedger()` catches it → "TAMPER DETECTED" at the broken seq → "Restore" repairs it. Tamper is a
+  reversible mutation of the hashed JSON (sentinel-packed original in the summary; no extra storage).
+  Verified live: tamper broke seq 8, restore returned to ok. `getLedgerState/tamperLedger/restoreLedger`
+  in `db/repo.ts`; `/api/ledger` GET/POST; `components/ledger/ledger-view.tsx`.
 - ⬜ Act 2 — dedicated "shoot a fresh photo" moment (mostly covered by Act 1 upload). Low priority.
-- ⬜ Act 4 — ledger ticker UI + live tamper demo. `verifyLedger()` (handles sop + finance content) already
-  implemented in `db/repo.ts`; needs a UI page that lists the chain and a "tamper a row" → re-verify flow.
-- ⬜ Polish: harden the Act 1 drop zone (non-file drops), swap model to Opus, visual pass before the demo.
+- ⬜ Demo hardening (next): harden the Act 1 drop zone (non-file drops); add a "reset demo data" control
+  (the ledger accumulates test entries — `rm mpkb.db && pnpm db:migrate` clears it for now); wire a real
+  Telegram alert if creds provided.
+- ⬜ Polish: swap model to Opus for the demo; visual pass; Andrea's real photos + procurement numbers.
 
 ## Architecture note (applies to all acts)
 The winning pattern, reused per act: **deterministic/structured facts + Claude for streamed reasoning &

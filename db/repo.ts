@@ -4,9 +4,10 @@ import { db } from "./index";
 import { events, financeEvents, ledger, type EventRow, type FinanceEventRow, type LedgerRow } from "./schema";
 import { chainHash, GENESIS_HASH, hashPayload } from "@/lib/ledger-hash";
 import type { LedgerStamp } from "@/lib/events";
-import type { Verdict } from "@/schemas/verdict";
-import type { FinanceAssessment, ProcurementScenario } from "@/schemas/finance";
+import type { Verdict, SopStatus } from "@/schemas/verdict";
+import type { FinanceAssessment, OverallRisk, ProcurementScenario } from "@/schemas/finance";
 import type { ReconciliationResult } from "@/lib/finance/reconcile";
+import type { LedgerStateView, LedgerEntryView } from "@/lib/ledger-view";
 
 /**
  * Repository = the only place that reads/writes domain tables. Keeps DB access
@@ -209,4 +210,118 @@ export function verifyLedger(): { ok: boolean; brokenSeq?: number; reason?: stri
   }
 
   return { ok: true };
+}
+
+/*
+ * Tamper demo (Act 4). We need a reversible way to "edit a sealed record" that
+ * changes the HASHED content so verifyLedger() catches it. We flip the verdict/
+ * risk to look clean and stash the original inside the summary behind a sentinel,
+ * so restore is exact with no extra storage.
+ */
+const TAMPER_SENTINEL = "§T§";
+
+function packTamper(original: string, summary: string): string {
+  return `${TAMPER_SENTINEL}${original}§${summary}`;
+}
+
+function unpackTamper(summary: string): { original: string; summary: string } | null {
+  if (!summary.startsWith(TAMPER_SENTINEL)) return null;
+  const rest = summary.slice(TAMPER_SENTINEL.length);
+  const sep = rest.indexOf("§");
+  if (sep < 0) return null;
+  return { original: rest.slice(0, sep), summary: rest.slice(sep + 1) };
+}
+
+function displaySummary(summary: string): string {
+  return unpackTamper(summary)?.summary ?? summary;
+}
+
+/** Build the full chain view + verification for the Ledger page. */
+export function getLedgerState(): LedgerStateView {
+  const rows = getLedger();
+  const entries: LedgerEntryView[] = rows.map((row) => {
+    const base = {
+      seq: row.seq,
+      createdAt: row.createdAt.getTime(),
+      hash: row.hash,
+      prevHash: row.prevHash,
+    };
+
+    if (row.kind === "sop_event" && row.refId) {
+      const ev = db.select().from(events).where(eq(events.id, row.refId)).get();
+      if (ev) {
+        return {
+          ...base,
+          kind: "sop_event",
+          title: ev.zone,
+          detail: displaySummary(ev.verdict.summary),
+          badge: { type: "status", value: ev.verdict.overallStatus },
+        };
+      }
+    }
+
+    if (row.kind === "finance_event" && row.refId) {
+      const ev = db.select().from(financeEvents).where(eq(financeEvents.id, row.refId)).get();
+      if (ev) {
+        return {
+          ...base,
+          kind: "finance_event",
+          title: `${ev.kitchen} · ${ev.dateIso}`,
+          detail: displaySummary(ev.assessment.summary),
+          badge: { type: "risk", value: ev.assessment.overallRisk },
+        };
+      }
+    }
+
+    return { ...base, kind: row.kind as LedgerEntryView["kind"], title: row.kind, detail: "", badge: null };
+  });
+
+  return { entries, verification: verifyLedger() };
+}
+
+/** Silently alter the most recent sealed record (prefer a finance audit) to look clean. */
+export function tamperLedger(): { tampered: boolean } {
+  const rows = getLedger();
+  const finance = [...rows].reverse().find((r) => r.kind === "finance_event" && r.refId);
+  const sop = [...rows].reverse().find((r) => r.kind === "sop_event" && r.refId);
+  const target = finance ?? sop;
+  if (!target?.refId) return { tampered: false };
+
+  if (target.kind === "finance_event") {
+    const ev = db.select().from(financeEvents).where(eq(financeEvents.id, target.refId)).get();
+    if (!ev || unpackTamper(ev.assessment.summary)) return { tampered: Boolean(ev) };
+    const assessment: FinanceAssessment = {
+      ...ev.assessment,
+      overallRisk: "low",
+      summary: packTamper(ev.assessment.overallRisk, ev.assessment.summary),
+    };
+    db.update(financeEvents).set({ assessment, overallRisk: "low" }).where(eq(financeEvents.id, ev.id)).run();
+    return { tampered: true };
+  }
+
+  const ev = db.select().from(events).where(eq(events.id, target.refId)).get();
+  if (!ev || unpackTamper(ev.verdict.summary)) return { tampered: Boolean(ev) };
+  const verdict: Verdict = {
+    ...ev.verdict,
+    overallStatus: "pass",
+    summary: packTamper(ev.verdict.overallStatus, ev.verdict.summary),
+  };
+  db.update(events).set({ verdict, overallStatus: "pass" }).where(eq(events.id, ev.id)).run();
+  return { tampered: true };
+}
+
+/** Revert any tampered records to their original sealed content. */
+export function restoreLedger(): void {
+  for (const ev of db.select().from(financeEvents).all()) {
+    const u = unpackTamper(ev.assessment.summary);
+    if (!u) continue;
+    const assessment: FinanceAssessment = { ...ev.assessment, overallRisk: u.original as OverallRisk, summary: u.summary };
+    db.update(financeEvents).set({ assessment, overallRisk: u.original }).where(eq(financeEvents.id, ev.id)).run();
+  }
+  for (const ev of db.select().from(events).all()) {
+    const u = unpackTamper(ev.verdict.summary);
+    if (!u) continue;
+    const verdict: Verdict = { ...ev.verdict, overallStatus: u.original as SopStatus, summary: u.summary };
+    db.update(events).set({ verdict, overallStatus: u.original }).where(eq(events.id, ev.id)).run();
+  }
 }
