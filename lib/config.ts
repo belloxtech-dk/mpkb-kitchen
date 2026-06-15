@@ -10,12 +10,12 @@ import { z } from "zod";
  *                    throws when a feature that needs it (vision, telegram) runs.
  */
 
-export const dbFileName = process.env.DB_FILE_NAME ?? "./mpkb.db";
+/** Postgres connection string. Read directly so DB tooling never needs the Anthropic key. */
+export const databaseUrl = process.env.DATABASE_URL ?? "postgresql://localhost:5432/mpkb_kitchen";
 
 const EnvSchema = z.object({
   ANTHROPIC_API_KEY: z.string().min(1, "ANTHROPIC_API_KEY is missing — add it to .env.local"),
   ANTHROPIC_MODEL: z.string().min(1).default("claude-sonnet-4-6"),
-  DB_FILE_NAME: z.string().min(1).default("./mpkb.db"),
   TELEGRAM_BOT_TOKEN: z.string().default(""),
   TELEGRAM_CHAT_ID: z.string().default(""),
 });

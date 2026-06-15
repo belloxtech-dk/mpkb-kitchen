@@ -34,7 +34,7 @@ export async function POST(req: Request): Promise<Response> {
         const final = await vision.finalMessage();
         const verdict = extractVerdict(final);
 
-        const { event, stamp } = recordSopEvent({ zone, source, verdict });
+        const { event, stamp } = await recordSopEvent({ zone, source, verdict });
         send({ type: "verdict", eventId: event.id, verdict, ledger: stamp });
 
         const alert = deriveAlert(zone, verdict, locale);

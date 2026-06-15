@@ -47,7 +47,7 @@ export async function POST(req: Request): Promise<Response> {
         const final = await audit.finalMessage();
         const assessment = extractAssessment(final);
 
-        const { event, stamp } = recordFinanceEvent({ scenario, reconciliation, assessment });
+        const { event, stamp } = await recordFinanceEvent({ scenario, reconciliation, assessment });
         send({ type: "assessment", eventId: event.id, assessment, ledger: stamp });
 
         send({ type: "done" });

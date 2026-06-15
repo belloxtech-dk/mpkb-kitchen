@@ -12,6 +12,7 @@ import type { LedgerStateView, LedgerEntryView } from "@/lib/ledger-view";
 /**
  * Repository = the only place that reads/writes domain tables. Keeps DB access
  * DRY and centralizes the ledger-chaining invariant so callers can't forget it.
+ * All functions are async (the Postgres driver is async).
  */
 
 export interface RecordSopEventInput {
@@ -33,12 +34,12 @@ function sopPayload(row: { id: string; zone: string; source: string; createdAtMs
 }
 
 /** Persist an SOP verdict and append a chained ledger stamp, atomically. */
-export function recordSopEvent(input: RecordSopEventInput): { event: EventRow; stamp: LedgerStamp } {
-  return db.transaction((tx) => {
+export async function recordSopEvent(input: RecordSopEventInput): Promise<{ event: EventRow; stamp: LedgerStamp }> {
+  return db.transaction(async (tx) => {
     const id = randomUUID();
     const createdAt = new Date();
 
-    const event = tx
+    const [event] = await tx
       .insert(events)
       .values({
         id,
@@ -50,23 +51,21 @@ export function recordSopEvent(input: RecordSopEventInput): { event: EventRow; s
         summary: input.verdict.summary,
         verdict: input.verdict,
       })
-      .returning()
-      .get();
+      .returning();
 
-    const prev = tx.select().from(ledger).orderBy(desc(ledger.seq)).limit(1).get();
+    const [prev] = await tx.select().from(ledger).orderBy(desc(ledger.seq)).limit(1);
     const prevHash = prev?.hash ?? GENESIS_HASH;
     const payloadHash = hashPayload(
       sopPayload({ id, zone: input.zone, source: input.source, createdAtMs: createdAt.getTime(), verdict: input.verdict }),
     );
     const hash = chainHash(prevHash, payloadHash);
 
-    const stamp = tx
+    const [stamp] = await tx
       .insert(ledger)
       .values({ createdAt, kind: "sop_event", refId: id, payloadHash, prevHash, hash })
-      .returning()
-      .get();
+      .returning();
 
-    return { event, stamp: { seq: stamp.seq, hash, prevHash } };
+    return { event: event!, stamp: { seq: stamp!.seq, hash, prevHash } };
   });
 }
 
@@ -99,13 +98,15 @@ function financePayload(row: {
 }
 
 /** Persist a finance audit and append a chained ledger stamp, atomically. */
-export function recordFinanceEvent(input: RecordFinanceEventInput): { event: FinanceEventRow; stamp: LedgerStamp } {
+export async function recordFinanceEvent(
+  input: RecordFinanceEventInput,
+): Promise<{ event: FinanceEventRow; stamp: LedgerStamp }> {
   const { scenario, reconciliation, assessment } = input;
-  return db.transaction((tx) => {
+  return db.transaction(async (tx) => {
     const id = randomUUID();
     const createdAt = new Date();
 
-    const event = tx
+    const [event] = await tx
       .insert(financeEvents)
       .values({
         id,
@@ -119,10 +120,9 @@ export function recordFinanceEvent(input: RecordFinanceEventInput): { event: Fin
         reconciliation,
         assessment,
       })
-      .returning()
-      .get();
+      .returning();
 
-    const prev = tx.select().from(ledger).orderBy(desc(ledger.seq)).limit(1).get();
+    const [prev] = await tx.select().from(ledger).orderBy(desc(ledger.seq)).limit(1);
     const prevHash = prev?.hash ?? GENESIS_HASH;
     const payloadHash = hashPayload(
       financePayload({
@@ -137,30 +137,29 @@ export function recordFinanceEvent(input: RecordFinanceEventInput): { event: Fin
     );
     const hash = chainHash(prevHash, payloadHash);
 
-    const stamp = tx
+    const [stamp] = await tx
       .insert(ledger)
       .values({ createdAt, kind: "finance_event", refId: id, payloadHash, prevHash, hash })
-      .returning()
-      .get();
+      .returning();
 
-    return { event, stamp: { seq: stamp.seq, hash, prevHash } };
+    return { event: event!, stamp: { seq: stamp!.seq, hash, prevHash } };
   });
 }
 
-export function getRecentEvents(limit = 50): EventRow[] {
-  return db.select().from(events).orderBy(desc(events.createdAt)).limit(limit).all();
+export async function getRecentEvents(limit = 50): Promise<EventRow[]> {
+  return db.select().from(events).orderBy(desc(events.createdAt)).limit(limit);
 }
 
-export function getLedger(): LedgerRow[] {
-  return db.select().from(ledger).orderBy(ledger.seq).all();
+export async function getLedger(): Promise<LedgerRow[]> {
+  return db.select().from(ledger).orderBy(ledger.seq);
 }
 
 /**
  * Recompute the chain and the per-event content hashes. Returns the first seq
  * where the chain is broken (used by the Act 4 tamper demo).
  */
-export function verifyLedger(): { ok: boolean; brokenSeq?: number; reason?: string } {
-  const rows = getLedger();
+export async function verifyLedger(): Promise<{ ok: boolean; brokenSeq?: number; reason?: string }> {
+  const rows = await getLedger();
   let prevHash = GENESIS_HASH;
 
   for (const row of rows) {
@@ -169,7 +168,7 @@ export function verifyLedger(): { ok: boolean; brokenSeq?: number; reason?: stri
     }
 
     if (row.kind === "sop_event" && row.refId) {
-      const ev = db.select().from(events).where(eq(events.id, row.refId)).get();
+      const [ev] = await db.select().from(events).where(eq(events.id, row.refId)).limit(1);
       if (ev) {
         const recomputed = hashPayload(
           sopPayload({
@@ -187,7 +186,7 @@ export function verifyLedger(): { ok: boolean; brokenSeq?: number; reason?: stri
     }
 
     if (row.kind === "finance_event" && row.refId) {
-      const ev = db.select().from(financeEvents).where(eq(financeEvents.id, row.refId)).get();
+      const [ev] = await db.select().from(financeEvents).where(eq(financeEvents.id, row.refId)).limit(1);
       if (ev) {
         const recomputed = hashPayload(
           financePayload({
@@ -212,11 +211,16 @@ export function verifyLedger(): { ok: boolean; brokenSeq?: number; reason?: stri
   return { ok: true };
 }
 
+/** Wipe all demo data (events, finance audits, ledger) for a clean demo start. */
+export async function resetDemoData(): Promise<void> {
+  await db.execute(sql`TRUNCATE TABLE ledger, events, finance_events RESTART IDENTITY CASCADE`);
+}
+
 /*
- * Tamper demo (Act 4). We need a reversible way to "edit a sealed record" that
- * changes the HASHED content so verifyLedger() catches it. We flip the verdict/
- * risk to look clean and stash the original inside the summary behind a sentinel,
- * so restore is exact with no extra storage.
+ * Tamper demo (Act 4). A reversible way to "edit a sealed record" that changes
+ * the HASHED content so verifyLedger() catches it. We flip the verdict/risk to
+ * look clean and stash the original inside the summary behind a sentinel, so
+ * restore is exact with no extra storage.
  */
 const TAMPER_SENTINEL = "§T§";
 
@@ -237,9 +241,11 @@ function displaySummary(summary: string): string {
 }
 
 /** Build the full chain view + verification for the Ledger page. */
-export function getLedgerState(): LedgerStateView {
-  const rows = getLedger();
-  const entries: LedgerEntryView[] = rows.map((row) => {
+export async function getLedgerState(): Promise<LedgerStateView> {
+  const rows = await getLedger();
+  const entries: LedgerEntryView[] = [];
+
+  for (const row of rows) {
     const base = {
       seq: row.seq,
       createdAt: row.createdAt.getTime(),
@@ -248,91 +254,82 @@ export function getLedgerState(): LedgerStateView {
     };
 
     if (row.kind === "sop_event" && row.refId) {
-      const ev = db.select().from(events).where(eq(events.id, row.refId)).get();
+      const [ev] = await db.select().from(events).where(eq(events.id, row.refId)).limit(1);
       if (ev) {
-        return {
+        entries.push({
           ...base,
           kind: "sop_event",
           title: ev.zone,
           detail: displaySummary(ev.verdict.summary),
           badge: { type: "status", value: ev.verdict.overallStatus },
-        };
+        });
+        continue;
       }
     }
 
     if (row.kind === "finance_event" && row.refId) {
-      const ev = db.select().from(financeEvents).where(eq(financeEvents.id, row.refId)).get();
+      const [ev] = await db.select().from(financeEvents).where(eq(financeEvents.id, row.refId)).limit(1);
       if (ev) {
-        return {
+        entries.push({
           ...base,
           kind: "finance_event",
           title: `${ev.kitchen} · ${ev.dateIso}`,
           detail: displaySummary(ev.assessment.summary),
           badge: { type: "risk", value: ev.assessment.overallRisk },
-        };
+        });
+        continue;
       }
     }
 
-    return { ...base, kind: row.kind as LedgerEntryView["kind"], title: row.kind, detail: "", badge: null };
-  });
+    entries.push({ ...base, kind: row.kind as LedgerEntryView["kind"], title: row.kind, detail: "", badge: null });
+  }
 
-  return { entries, verification: verifyLedger() };
+  return { entries, verification: await verifyLedger() };
 }
 
 /** Silently alter the most recent sealed record (prefer a finance audit) to look clean. */
-export function tamperLedger(): { tampered: boolean } {
-  const rows = getLedger();
+export async function tamperLedger(): Promise<{ tampered: boolean }> {
+  const rows = await getLedger();
   const finance = [...rows].reverse().find((r) => r.kind === "finance_event" && r.refId);
   const sop = [...rows].reverse().find((r) => r.kind === "sop_event" && r.refId);
   const target = finance ?? sop;
   if (!target?.refId) return { tampered: false };
 
   if (target.kind === "finance_event") {
-    const ev = db.select().from(financeEvents).where(eq(financeEvents.id, target.refId)).get();
+    const [ev] = await db.select().from(financeEvents).where(eq(financeEvents.id, target.refId)).limit(1);
     if (!ev || unpackTamper(ev.assessment.summary)) return { tampered: Boolean(ev) };
     const assessment: FinanceAssessment = {
       ...ev.assessment,
       overallRisk: "low",
       summary: packTamper(ev.assessment.overallRisk, ev.assessment.summary),
     };
-    db.update(financeEvents).set({ assessment, overallRisk: "low" }).where(eq(financeEvents.id, ev.id)).run();
+    await db.update(financeEvents).set({ assessment, overallRisk: "low" }).where(eq(financeEvents.id, ev.id));
     return { tampered: true };
   }
 
-  const ev = db.select().from(events).where(eq(events.id, target.refId)).get();
+  const [ev] = await db.select().from(events).where(eq(events.id, target.refId)).limit(1);
   if (!ev || unpackTamper(ev.verdict.summary)) return { tampered: Boolean(ev) };
   const verdict: Verdict = {
     ...ev.verdict,
     overallStatus: "pass",
     summary: packTamper(ev.verdict.overallStatus, ev.verdict.summary),
   };
-  db.update(events).set({ verdict, overallStatus: "pass" }).where(eq(events.id, ev.id)).run();
+  await db.update(events).set({ verdict, overallStatus: "pass" }).where(eq(events.id, ev.id));
   return { tampered: true };
 }
 
-/** Wipe all demo data (events, finance audits, ledger) for a clean demo start. */
-export function resetDemoData(): void {
-  db.transaction((tx) => {
-    tx.delete(ledger).run();
-    tx.delete(events).run();
-    tx.delete(financeEvents).run();
-    // restart the ledger seq counter so the next demo begins at #1
-    tx.run(sql`DELETE FROM sqlite_sequence WHERE name = 'ledger'`);
-  });
-}
-
 /** Revert any tampered records to their original sealed content. */
-export function restoreLedger(): void {
-  for (const ev of db.select().from(financeEvents).all()) {
+export async function restoreLedger(): Promise<void> {
+  for (const ev of await db.select().from(financeEvents)) {
     const u = unpackTamper(ev.assessment.summary);
     if (!u) continue;
     const assessment: FinanceAssessment = { ...ev.assessment, overallRisk: u.original as OverallRisk, summary: u.summary };
-    db.update(financeEvents).set({ assessment, overallRisk: u.original }).where(eq(financeEvents.id, ev.id)).run();
+    await db.update(financeEvents).set({ assessment, overallRisk: u.original }).where(eq(financeEvents.id, ev.id));
   }
-  for (const ev of db.select().from(events).all()) {
+  for (const ev of await db.select().from(events)) {
     const u = unpackTamper(ev.verdict.summary);
     if (!u) continue;
     const verdict: Verdict = { ...ev.verdict, overallStatus: u.original as SopStatus, summary: u.summary };
-    db.update(events).set({ verdict, overallStatus: u.original }).where(eq(events.id, ev.id)).run();
+    await db.update(events).set({ verdict, overallStatus: u.original }).where(eq(events.id, ev.id));
   }
 }

@@ -1,17 +1,15 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import { dbFileName } from "@/lib/config";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import { databaseUrl } from "@/lib/config";
 import * as schema from "./schema";
 
 /**
- * The DB abstraction layer's single connection. Everything goes through `db`
- * (and the helpers in db/repo.ts) — never construct another connection.
+ * The DB abstraction layer's single pooled connection. Everything goes through
+ * `db` (and the helpers in db/repo.ts) — never construct another pool.
  */
 
-const sqlite = new Database(dbFileName);
-sqlite.pragma("journal_mode = WAL");
-sqlite.pragma("foreign_keys = ON");
+const pool = new Pool({ connectionString: databaseUrl });
 
-export const db = drizzle(sqlite, { schema });
+export const db = drizzle(pool, { schema });
 export { schema };
 export type DB = typeof db;

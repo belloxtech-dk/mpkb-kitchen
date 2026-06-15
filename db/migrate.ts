@@ -2,16 +2,20 @@
  * Standalone migration runner (run via `pnpm db:migrate`).
  * Self-contained on purpose — no `@/` alias imports — so it runs cleanly under tsx.
  */
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { Pool } from "pg";
 
-const dbFileName = process.env.DB_FILE_NAME ?? "./mpkb.db";
+const url = process.env.DATABASE_URL ?? "postgresql://localhost:5432/mpkb_kitchen";
 
-const sqlite = new Database(dbFileName);
-sqlite.pragma("journal_mode = WAL");
+async function main() {
+  const pool = new Pool({ connectionString: url });
+  await migrate(drizzle(pool), { migrationsFolder: "./db/migrations" });
+  await pool.end();
+  console.log(`✓ migrations applied to ${url.replace(/:\/\/.*@/, "://***@")}`);
+}
 
-migrate(drizzle(sqlite), { migrationsFolder: "./db/migrations" });
-sqlite.close();
-
-console.log(`✓ migrations applied to ${dbFileName}`);
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
