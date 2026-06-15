@@ -94,6 +94,24 @@ The codebase is built around single sources of truth. Before adding anything, re
 - Keep components presentational; put logic in `lib/`. Prefer small, composable modules. Don't duplicate —
   if you need a value/shape/style in two places, lift it to its SSOT module and import.
 
+## Auth (Better Auth) — Push 2, done
+Invite-only, magic-link sign-in. Roles **superadmin / admin / user** (hierarchy: superadmin ⊇ admin ⊇ user).
+- `lib/auth.ts` (server: drizzleAdapter pg, `magicLink({disableSignUp:true})`, admin plugin, `nextCookies`),
+  `lib/auth-client.ts` (browser), `lib/auth/{roles,permissions,session,email}.ts`. Auth tables in
+  `db/auth-schema.ts` (user/session/account/verification). Handler at `app/api/auth/[...all]`.
+- **Roles SSOT = `lib/auth/roles.ts`** (`isAdmin`, `isSuperadmin`, `assignableRoles`). Use these for gating.
+- **Gating:** `proxy.ts` (Next 16 proxy convention) does the optimistic cookie redirect; the real check is
+  server-side in `app/(authed)/layout.tsx` (redirect to `/landing` if no session). `/admin` (admin+super)
+  and `/superadmin` (super only) re-check role in the page. App lives under `app/(authed)/`; public
+  `/landing` has the magic-link form.
+- **Invite:** admin/superadmin only, `POST /api/admin/invite` (`auth.api.createUser` + sends a magic link).
+  admin can invite `user`; superadmin can invite `user`+`admin`. No public sign-up — magic link only signs in
+  EXISTING (invited) users.
+- **Bootstrap:** `pnpm seed` upserts jasongalvin@gmail.com as superadmin (idempotent, `db/seed.ts`).
+- Email via Resend if `RESEND_API_KEY` set, else the link is console-logged (`lib/auth/email.ts`).
+- All auth UI is bilingual (dictionary `auth` section). Verified live: magic-link sign-in, role in session,
+  invite, invite-only (uninvited email creates nothing), user blocked from /admin + /superadmin (403/redirect).
+
 ## Bilingual (i18n) — REQUIRED for all future work
 The app is fully bilingual: **Bahasa Indonesia (default) + English**, toggled in the header (cookie
 `mpkb_locale`, re-renders server + client). Every new feature MUST support both — no hardcoded
@@ -122,10 +140,14 @@ id for the real demo). Telegram alert optional via env.
 This machine has no global `node`/`npm`; Node lives under nvm. For every shell command, prepend:
 `export PATH="$HOME/.nvm/versions/node/v22.22.3/bin:$PATH"` (pinned in `.nvmrc`). `pnpm` is the package
 manager. Then:
-1. Create `.env.local` from `.env.example` and add `ANTHROPIC_API_KEY` (Jason provides a project key).
+1. Create `.env.local` from `.env.example` and add `ANTHROPIC_API_KEY` (Jason provides a project key) and a
+   `BETTER_AUTH_SECRET` (`openssl rand -base64 32`).
 2. `pnpm install`; ensure Postgres is running and create the DB (`createdb mpkb_kitchen`); set `DATABASE_URL`
    in `.env.local` if it isn't `postgresql://localhost:5432/mpkb_kitchen` (the default). Then `pnpm db:migrate`
-   (creates the tables; reads `.env.local`) → `pnpm dev`.
+   (creates the tables) → `pnpm seed` (makes jasongalvin@gmail.com a superadmin) → `pnpm dev`.
+   - **Signing in (dev):** the app is invite-only/magic-link. With no `RESEND_API_KEY`, the sign-in link is
+     **printed to the `pnpm dev` console** — copy it into the browser to sign in. Set `RESEND_API_KEY` to
+     email real links.
 3. Open the app, drop a kitchen photo on a zone tile (or click Add frame) → watch Claude narrate and the
    SOP checklist fill in. "Run sweep" analyzes all populated zones.
 - Staged auto-cycling: drop photos into `public/frames/` and list them in `public/frames/manifest.json`.
@@ -160,8 +182,9 @@ manager. Then:
 - ✅ Demo hardening: Act 1 drop zone hardened (non-file drops); "Reset demo data" control on the Ledger
   tab (clears events/finance/ledger via `TRUNCATE … RESTART IDENTITY`); fleet context bar (multi-kitchen
   illusion). ⬜ still: wire a real Telegram alert if creds provided.
-- ✅ Push 1: migrated SQLite → PostgreSQL (pg + drizzle node-postgres; repo is async). Push 2 (Better Auth:
-  invite-only, superadmin/admin/user, magic-link) is planned next on the Postgres base.
+- ✅ Push 1: migrated SQLite → PostgreSQL (pg + drizzle node-postgres; repo is async).
+- ✅ Push 2: Better Auth — invite-only, magic-link, roles superadmin/admin/user, gated app + admin/superadmin
+  pages, superadmin seeded. See the Auth section above.
 - ⬜ Polish: swap model to Opus for the demo; visual pass; Andrea's real photos + procurement numbers.
 
 ## Architecture note (applies to all acts)
