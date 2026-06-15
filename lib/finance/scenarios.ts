@@ -9,6 +9,7 @@ const RAW: ProcurementScenario[] = [
   {
     id: "2026-06-15-flagged",
     label: "15 Jun 2026 — irregularities present",
+    labelId: "15 Jun 2026 — ada kejanggalan",
     dateIso: "2026-06-15",
     kitchen: "Dapur SPPG Percontohan · Lombok",
     meals: { enrolled: 540, present: 498, mealsServed: 498, mealsBilled: 650 },
@@ -35,6 +36,7 @@ const RAW: ProcurementScenario[] = [
   {
     id: "2026-06-12-clean",
     label: "12 Jun 2026 — clean day (control)",
+    labelId: "12 Jun 2026 — hari bersih (kontrol)",
     dateIso: "2026-06-12",
     kitchen: "Dapur SPPG Percontohan · Lombok",
     meals: { enrolled: 540, present: 505, mealsServed: 505, mealsBilled: 505 },

@@ -10,6 +10,7 @@ import { fileToImage, urlToImage, type LoadedImage } from "@/lib/image-client";
 import { useAnalysis, type AnalysisInput } from "@/lib/use-analysis";
 import { scoreColor } from "@/lib/status-styles";
 import { cn } from "@/lib/cn";
+import { useLocale, useMessages } from "@/lib/i18n/context";
 import type { Verdict } from "@/schemas/verdict";
 
 type Source = "frame" | "upload";
@@ -22,6 +23,8 @@ export function KitchenMonitor() {
 
   const analysis = useAnalysis();
   const busy = analysis.status === "analyzing";
+  const m = useMessages();
+  const locale = useLocale();
 
   // Load the manifest and preload any staged frames.
   useEffect(() => {
@@ -49,12 +52,18 @@ export function KitchenMonitor() {
 
   const analyze = useCallback(
     async (zoneId: string, image: LoadedImage, source: Source) => {
-      const input: AnalysisInput = { zone: zoneId, source, imageBase64: image.base64, mediaType: image.mediaType };
+      const input: AnalysisInput = {
+        zone: zoneId,
+        source,
+        imageBase64: image.base64,
+        mediaType: image.mediaType,
+        locale,
+      };
       const verdict = await analysis.run(input);
       if (verdict) setResults((prev) => ({ ...prev, [zoneId]: verdict }));
       return verdict;
     },
-    [analysis],
+    [analysis, locale],
   );
 
   const handlePickFile = useCallback(
@@ -91,9 +100,9 @@ export function KitchenMonitor() {
       {/* summary bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-surface px-4 py-3">
         <div className="flex items-center gap-5">
-          <Stat label="Kitchen score" value={avgScore === null ? "—" : String(avgScore)} valueClass={avgScore === null ? "text-muted" : scoreColor(avgScore)} />
-          <Stat label="Zones flagged" value={String(flagged)} valueClass={flagged > 0 ? "text-fail" : "text-pass"} />
-          <Stat label="Analyzed" value={`${scored.length}/${zones.length || "—"}`} valueClass="text-fg" />
+          <Stat label={m.floor.kitchenScore} value={avgScore === null ? "—" : String(avgScore)} valueClass={avgScore === null ? "text-muted" : scoreColor(avgScore)} />
+          <Stat label={m.floor.zonesFlagged} value={String(flagged)} valueClass={flagged > 0 ? "text-fail" : "text-pass"} />
+          <Stat label={m.floor.analyzed} value={`${scored.length}/${zones.length || "—"}`} valueClass="text-fg" />
         </div>
         <button
           type="button"
@@ -101,7 +110,7 @@ export function KitchenMonitor() {
           disabled={busy || !hasImages}
           className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-40"
         >
-          {busy ? "Sweeping…" : "Run sweep"}
+          {busy ? m.floor.sweeping : m.floor.runSweep}
         </button>
       </div>
 
@@ -110,7 +119,7 @@ export function KitchenMonitor() {
         <div className="grid gap-3 sm:grid-cols-2">
           {zones.length === 0 && (
             <div className="col-span-full rounded-xl border border-dashed bg-surface p-8 text-center text-sm text-muted">
-              Loading camera zones…
+              {m.floor.loadingZones}
             </div>
           )}
           {zones.map((zone) => (
@@ -132,7 +141,13 @@ export function KitchenMonitor() {
 
         {/* inspector panel */}
         <div className="space-y-3">
-          <ReasoningStream text={analysis.reasoning} active={busy} />
+          <ReasoningStream
+            text={analysis.reasoning}
+            active={busy}
+            label={m.floor.reasoningLabel}
+            activePlaceholder={m.floor.reasoningActive}
+            idlePlaceholder={m.floor.reasoningIdle}
+          />
           <VerdictPanel verdict={analysis.verdict} ledger={analysis.ledger} />
           {analysis.alert && <AlertCard alert={analysis.alert} />}
           {analysis.error && (

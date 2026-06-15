@@ -4,11 +4,12 @@ import { getScenario } from "@/lib/finance/scenarios";
 import { reconcile } from "@/lib/finance/reconcile";
 import { createAuditStream, extractAssessment } from "@/lib/finance/audit";
 import { recordFinanceEvent } from "@/db/repo";
+import { LocaleSchema } from "@/lib/i18n/locale";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const BodySchema = z.object({ scenarioId: z.string().min(1) });
+const BodySchema = z.object({ scenarioId: z.string().min(1), locale: LocaleSchema.default("id") });
 
 export async function POST(req: Request): Promise<Response> {
   let raw: unknown;
@@ -23,9 +24,10 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json({ error: "Invalid request", issues: parsed.error.issues }, { status: 422 });
   }
 
-  const scenario = getScenario(parsed.data.scenarioId);
+  const { scenarioId, locale } = parsed.data;
+  const scenario = getScenario(scenarioId);
   if (!scenario) {
-    return Response.json({ error: `Unknown scenario: ${parsed.data.scenarioId}` }, { status: 404 });
+    return Response.json({ error: `Unknown scenario: ${scenarioId}` }, { status: 404 });
   }
 
   const encoder = new TextEncoder();
@@ -36,10 +38,10 @@ export async function POST(req: Request): Promise<Response> {
         send({ type: "status", state: "started", scenarioId: scenario.id });
 
         // Exact numbers first — UI renders findings immediately, before the AI narrates.
-        const reconciliation = reconcile(scenario);
+        const reconciliation = reconcile(scenario, locale);
         send({ type: "reconciliation", result: reconciliation });
 
-        const audit = createAuditStream({ scenario, reconciliation });
+        const audit = createAuditStream({ scenario, reconciliation, locale });
         audit.on("text", (delta: string) => send({ type: "reasoning_delta", text: delta }));
 
         const final = await audit.finalMessage();

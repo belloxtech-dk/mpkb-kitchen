@@ -94,6 +94,24 @@ The codebase is built around single sources of truth. Before adding anything, re
 - Keep components presentational; put logic in `lib/`. Prefer small, composable modules. Don't duplicate —
   if you need a value/shape/style in two places, lift it to its SSOT module and import.
 
+## Bilingual (i18n) — REQUIRED for all future work
+The app is fully bilingual: **Bahasa Indonesia (default) + English**, toggled in the header (cookie
+`mpkb_locale`, re-renders server + client). Every new feature MUST support both — no hardcoded
+user-facing strings. Established pattern (keep DRY/SSOT):
+- **UI strings:** add to BOTH `id` and `en` in `lib/i18n/dictionary.ts` (the `Messages` type enforces
+  parity at compile time). Read via `useMessages()` (client) or `getServerMessages()` (server components /
+  page titles). Interpolated strings are functions in the dictionary.
+- **Enum labels:** the dictionary maps enum *values* → labels (`status`, `severity`, `risk`,
+  `findingKind`). `lib/status-styles.ts` holds colour only — never labels.
+- **AI text:** thread `locale` from the route into the prompt and append `messagesFor(locale).aiDirective`.
+  Claude writes free-text fields in the locale but keeps JSON field names + enum values in English.
+  Use generous `max_tokens` — Indonesian is ~1.5–2× more verbose; under-budgeting truncates the tool-call
+  JSON and breaks Zod parsing (this bit us: bumped audit→3000, vision→2500).
+- **Domain data with names:** carry both (`label`/`labelId`, as on SOP rules and finance scenarios); pick
+  by `locale`.
+- Files: `lib/i18n/{locale,dictionary,context,server}.ts`. Provider is wired in `app/layout.tsx`; toggle in
+  `components/site-header.tsx`.
+
 ## Stack (as built)
 TypeScript throughout. **Next.js 16 (App Router, Turbopack) · React 19 · Tailwind CSS v4 (CSS-first
 `@theme`) · Drizzle ORM + drizzle-kit + better-sqlite3 (SQLite) · Zod 4 · Anthropic TS SDK** (streaming +

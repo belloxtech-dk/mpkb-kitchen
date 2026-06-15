@@ -47,6 +47,7 @@ export type SupplierAward = z.infer<typeof SupplierAwardSchema>;
 export const ProcurementScenarioSchema = z.object({
   id: z.string(),
   label: z.string(),
+  labelId: z.string(),
   dateIso: z.string(),
   kitchen: z.string(),
   meals: MealCountSchema,

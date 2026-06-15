@@ -1,4 +1,6 @@
 import { formatIdr, formatNumber, formatPercent } from "@/lib/format";
+import { messagesFor, type Messages } from "@/lib/i18n/dictionary";
+import type { Locale } from "@/lib/i18n/locale";
 import type { FindingKind, ProcurementScenario } from "@/schemas/finance";
 import {
   DUPLICATE_AMOUNT_TOLERANCE,
@@ -10,6 +12,8 @@ import {
 /**
  * Deterministic reconciliation. ALL arithmetic is here (exact, auditable) — the
  * LLM never computes numbers, it only explains and judges these computed facts.
+ * Titles + static evidence labels are localized via the i18n dictionary; dynamic
+ * data (item names, suppliers, invoice ids) is left as-is.
  */
 
 export interface EvidenceRow {
@@ -31,33 +35,33 @@ export interface ReconciliationResult {
   totalLeakageIdr: number;
 }
 
-function ghostMeals(s: ProcurementScenario): ComputedFinding | null {
+function ghostMeals(s: ProcurementScenario, m: Messages): ComputedFinding | null {
   const { mealsBilled, mealsServed, enrolled, present } = s.meals;
   const ghost = mealsBilled - mealsServed;
   if (ghost <= 0) return null;
   const leakageIdr = ghost * s.costPerPortionIdr;
   return {
     kind: "ghost_meals",
-    title: "Ghost meals — billed beyond served",
+    title: m.finance.titles.ghost_meals,
     leakageIdr,
     evidence: [
-      { label: "Enrolled", value: formatNumber(enrolled) },
-      { label: "Present (attendance)", value: formatNumber(present) },
-      { label: "Meals served (log)", value: formatNumber(mealsServed) },
-      { label: "Meals billed (invoice)", value: formatNumber(mealsBilled) },
-      { label: "Unaccounted portions", value: `${formatNumber(ghost)} (${formatPercent(ghost / mealsBilled)})` },
-      { label: "Cost / portion", value: formatIdr(s.costPerPortionIdr) },
-      { label: "Estimated leakage", value: formatIdr(leakageIdr) },
+      { label: m.meal.enrolled, value: formatNumber(enrolled) },
+      { label: m.meal.present, value: formatNumber(present) },
+      { label: m.meal.served, value: formatNumber(mealsServed) },
+      { label: m.meal.billed, value: formatNumber(mealsBilled) },
+      { label: m.finance.ev.unaccounted, value: `${formatNumber(ghost)} (${formatPercent(ghost / mealsBilled)})` },
+      { label: m.finance.ev.costPerPortion, value: formatIdr(s.costPerPortionIdr) },
+      { label: m.finance.ev.estLeakage, value: formatIdr(leakageIdr) },
     ],
   };
 }
 
-function priceMarkup(s: ProcurementScenario): ComputedFinding | null {
+function priceMarkup(s: ProcurementScenario, m: Messages): ComputedFinding | null {
   const overpriced = s.lineItems
     .map((li) => {
       const overPerUnit = li.unitPriceIdr - li.referencePriceIdr;
       const fraction = li.referencePriceIdr > 0 ? overPerUnit / li.referencePriceIdr : 0;
-      return { li, overPerUnit, fraction, overTotal: overPerUnit * li.qty };
+      return { li, fraction, overTotal: overPerUnit * li.qty };
     })
     .filter((x) => x.fraction >= MARKUP_MIN_FRACTION && x.overTotal > 0);
 
@@ -66,16 +70,21 @@ function priceMarkup(s: ProcurementScenario): ComputedFinding | null {
 
   return {
     kind: "price_markup",
-    title: "Procurement markup over reference price",
+    title: m.finance.titles.price_markup,
     leakageIdr,
     evidence: overpriced.map((x) => ({
       label: `${x.li.item} (${formatNumber(x.li.qty)} ${x.li.unit}, ${x.li.supplier})`,
-      value: `${formatIdr(x.li.unitPriceIdr)} vs ref ${formatIdr(x.li.referencePriceIdr)} — +${formatPercent(x.fraction)} = ${formatIdr(x.overTotal)}`,
+      value: m.finance.ev.vsRef(
+        formatIdr(x.li.unitPriceIdr),
+        formatIdr(x.li.referencePriceIdr),
+        formatPercent(x.fraction),
+        formatIdr(x.overTotal),
+      ),
     })),
   };
 }
 
-function duplicateInvoice(s: ProcurementScenario): ComputedFinding | null {
+function duplicateInvoice(s: ProcurementScenario, m: Messages): ComputedFinding | null {
   for (let i = 0; i < s.invoices.length; i++) {
     for (let j = i + 1; j < s.invoices.length; j++) {
       const a = s.invoices[i]!;
@@ -86,12 +95,12 @@ function duplicateInvoice(s: ProcurementScenario): ComputedFinding | null {
       if (rel <= DUPLICATE_AMOUNT_TOLERANCE) {
         return {
           kind: "duplicate_invoice",
-          title: "Duplicate invoice — potential double payment",
+          title: m.finance.titles.duplicate_invoice,
           leakageIdr: Math.min(a.amountIdr, b.amountIdr),
           evidence: [
             { label: a.id, value: `${a.supplier} · ${formatIdr(a.amountIdr)} · ${a.dateIso}` },
             { label: b.id, value: `${b.supplier} · ${formatIdr(b.amountIdr)} · ${b.dateIso}` },
-            { label: "Amount difference", value: `${formatIdr(diff)} (${formatPercent(rel, 2)})` },
+            { label: m.finance.ev.amountDiff, value: `${formatIdr(diff)} (${formatPercent(rel, 2)})` },
           ],
         };
       }
@@ -100,7 +109,7 @@ function duplicateInvoice(s: ProcurementScenario): ComputedFinding | null {
   return null;
 }
 
-function thresholdGaming(s: ProcurementScenario): ComputedFinding | null {
+function thresholdGaming(s: ProcurementScenario, m: Messages): ComputedFinding | null {
   const limit = s.approvalThresholdIdr;
   const floor = limit * (1 - THRESHOLD_GAMING_BAND);
   const suspects = s.invoices.filter((inv) => inv.amountIdr >= floor && inv.amountIdr < limit);
@@ -108,19 +117,19 @@ function thresholdGaming(s: ProcurementScenario): ComputedFinding | null {
 
   return {
     kind: "threshold_gaming",
-    title: "Invoice priced just under the approval threshold",
+    title: m.finance.titles.threshold_gaming,
     leakageIdr: 0,
     evidence: [
-      { label: "Approval threshold", value: formatIdr(limit) },
+      { label: m.finance.ev.approvalThreshold, value: formatIdr(limit) },
       ...suspects.map((inv) => ({
         label: `${inv.id} (${inv.supplier})`,
-        value: `${formatIdr(inv.amountIdr)} — ${formatPercent((limit - inv.amountIdr) / limit, 2)} under limit`,
+        value: `${formatIdr(inv.amountIdr)} — ${m.finance.ev.underLimit(formatPercent((limit - inv.amountIdr) / limit, 2))}`,
       })),
     ],
   };
 }
 
-function supplierConcentration(s: ProcurementScenario): ComputedFinding | null {
+function supplierConcentration(s: ProcurementScenario, m: Messages): ComputedFinding | null {
   const total = s.awards.reduce((sum, a) => sum + a.awards, 0);
   if (total === 0) return null;
   const top = [...s.awards].sort((a, b) => b.awards - a.awards)[0]!;
@@ -129,21 +138,25 @@ function supplierConcentration(s: ProcurementScenario): ComputedFinding | null {
 
   return {
     kind: "supplier_concentration",
-    title: "Supplier concentration — limited competition",
+    title: m.finance.titles.supplier_concentration,
     leakageIdr: 0,
     evidence: [
-      { label: top.supplier, value: `${formatNumber(top.awards)} of ${formatNumber(total)} awards (${formatPercent(share)})` },
+      {
+        label: top.supplier,
+        value: m.finance.ev.ofAwards(formatNumber(top.awards), formatNumber(total), formatPercent(share)),
+      },
       ...s.awards
         .filter((a) => a.supplier !== top.supplier)
-        .map((a) => ({ label: a.supplier, value: `${formatNumber(a.awards)} awards` })),
+        .map((a) => ({ label: a.supplier, value: m.finance.ev.awardsCount(formatNumber(a.awards)) })),
     ],
   };
 }
 
 const DETECTORS = [ghostMeals, priceMarkup, duplicateInvoice, thresholdGaming, supplierConcentration];
 
-export function reconcile(scenario: ProcurementScenario): ReconciliationResult {
-  const findings = DETECTORS.map((d) => d(scenario)).filter((f): f is ComputedFinding => f !== null);
+export function reconcile(scenario: ProcurementScenario, locale: Locale): ReconciliationResult {
+  const m = messagesFor(locale);
+  const findings = DETECTORS.map((d) => d(scenario, m)).filter((f): f is ComputedFinding => f !== null);
   const totalLeakageIdr = findings.reduce((sum, f) => sum + f.leakageIdr, 0);
   return { scenarioId: scenario.id, findings, totalLeakageIdr };
 }

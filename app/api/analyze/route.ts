@@ -19,7 +19,7 @@ export async function POST(req: Request): Promise<Response> {
   if (!parsed.success) {
     return Response.json({ error: "Invalid request", issues: parsed.error.issues }, { status: 422 });
   }
-  const { zone, source, imageBase64, mediaType } = parsed.data;
+  const { zone, source, imageBase64, mediaType, locale } = parsed.data;
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
@@ -28,7 +28,7 @@ export async function POST(req: Request): Promise<Response> {
       try {
         send({ type: "status", state: "started", zone, source });
 
-        const vision = createVisionStream({ imageBase64, mediaType, zone });
+        const vision = createVisionStream({ imageBase64, mediaType, zone, locale });
         vision.on("text", (delta: string) => send({ type: "reasoning_delta", text: delta }));
 
         const final = await vision.finalMessage();
@@ -37,7 +37,7 @@ export async function POST(req: Request): Promise<Response> {
         const { event, stamp } = recordSopEvent({ zone, source, verdict });
         send({ type: "verdict", eventId: event.id, verdict, ledger: stamp });
 
-        const alert = deriveAlert(zone, verdict);
+        const alert = deriveAlert(zone, verdict, locale);
         if (alert) {
           const delivered = await sendTelegramAlert(alert);
           send({ type: "alert", alert: { ...alert, delivered } });

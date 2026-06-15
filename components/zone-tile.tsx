@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { STATUS_STYLE } from "@/lib/status-styles";
 import { cn } from "@/lib/cn";
+import { useMessages } from "@/lib/i18n/context";
 import type { ZoneDef } from "@/lib/frames";
 import type { LoadedImage } from "@/lib/image-client";
 import type { Verdict } from "@/schemas/verdict";
@@ -20,6 +21,7 @@ interface ZoneTileProps {
 export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnalyze }: ZoneTileProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  const m = useMessages();
   const status = result ? STATUS_STYLE[result.overallStatus] : null;
 
   const pick = (files: FileList | null) => {
@@ -55,7 +57,7 @@ export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnal
             className="flex size-full flex-col items-center justify-center gap-1 text-center text-muted transition hover:text-accent"
           >
             <span className="text-2xl">＋</span>
-            <span className="text-xs">Drop or click to add a frame</span>
+            <span className="text-xs">{m.zone.addHint}</span>
           </button>
         )}
 
@@ -63,12 +65,12 @@ export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnal
 
         <div className="absolute top-2 left-2 rounded-md bg-fg/70 px-2 py-0.5 font-mono text-[10px] tracking-wide text-surface">
           {zone.label}
-          {active && <span className="ml-1.5 text-accent-soft">● LIVE</span>}
+          {active && <span className="ml-1.5 text-accent-soft">● {m.zone.live}</span>}
         </div>
 
-        {status && (
+        {status && result && (
           <div className={cn("absolute top-2 right-2 rounded-md px-2 py-0.5 text-[10px] font-semibold", status.bg, status.text)}>
-            {status.label} · {Math.round(result!.complianceScore)}
+            {m.status[result.overallStatus]} · {Math.round(result.complianceScore)}
           </div>
         )}
       </div>
@@ -80,7 +82,7 @@ export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnal
           disabled={busy}
           className="text-xs text-muted transition hover:text-fg disabled:opacity-40"
         >
-          {image ? "Replace" : "Add frame"}
+          {image ? m.zone.replace : m.zone.add}
         </button>
         <button
           type="button"
@@ -88,7 +90,7 @@ export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnal
           disabled={!image || busy}
           className="rounded-md bg-accent px-3 py-1 text-xs font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-40"
         >
-          {active ? "Analyzing…" : result ? "Re-run" : "Analyze"}
+          {active ? m.zone.analyzing : result ? m.zone.rerun : m.zone.analyze}
         </button>
       </div>
 

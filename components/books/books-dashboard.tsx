@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { SCENARIOS } from "@/lib/finance/scenarios";
 import { useAudit } from "@/lib/use-audit";
+import { useLocale, useMessages } from "@/lib/i18n/context";
 import { InvoiceList, LineItemsTable, MealCounts, SupplierAwards } from "./scenario-docs";
 import { AuditPanel } from "./audit-panel";
 
 export function BooksDashboard() {
   const audit = useAudit();
   const auditing = audit.status === "auditing";
+  const m = useMessages();
+  const locale = useLocale();
 
   // SCENARIOS is a non-empty validated fixture list.
   const [selectedId, setSelectedId] = useState(SCENARIOS[0]!.id);
@@ -18,7 +21,7 @@ export function BooksDashboard() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-surface px-4 py-3">
         <label className="flex items-center gap-2">
-          <span className="text-xs text-muted">Procurement day</span>
+          <span className="text-xs text-muted">{m.books.procurementDay}</span>
           <select
             value={selectedId}
             onChange={(e) => {
@@ -30,18 +33,18 @@ export function BooksDashboard() {
           >
             {SCENARIOS.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.label}
+                {locale === "id" ? s.labelId : s.label}
               </option>
             ))}
           </select>
         </label>
         <button
           type="button"
-          onClick={() => audit.run(scenario.id)}
+          onClick={() => audit.run(scenario.id, locale)}
           disabled={auditing}
           className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-40"
         >
-          {auditing ? "Auditing…" : "Audit the books"}
+          {auditing ? m.books.auditing : m.books.audit}
         </button>
       </div>
 

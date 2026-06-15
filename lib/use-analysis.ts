@@ -4,12 +4,14 @@ import { useCallback, useRef, useState } from "react";
 import type { AnalysisEvent, KitchenAlert, LedgerStamp } from "@/lib/events";
 import type { ImageMediaType } from "@/schemas/analyze";
 import type { Verdict } from "@/schemas/verdict";
+import type { Locale } from "@/lib/i18n/locale";
 
 export interface AnalysisInput {
   zone: string;
   source: "frame" | "upload";
   imageBase64: string;
   mediaType: ImageMediaType;
+  locale: Locale;
 }
 
 export type AnalysisStatus = "idle" | "analyzing" | "done" | "error";

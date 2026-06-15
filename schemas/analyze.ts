@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LocaleSchema } from "@/lib/i18n/locale";
 
 /** SSOT for the /api/analyze request body. */
 
@@ -12,5 +13,6 @@ export const AnalyzeRequestSchema = z.object({
   /** Base64-encoded image data (no data: prefix). */
   imageBase64: z.string().min(1),
   mediaType: ImageMediaTypeSchema,
+  locale: LocaleSchema.default("id"),
 });
 export type AnalyzeRequest = z.infer<typeof AnalyzeRequestSchema>;

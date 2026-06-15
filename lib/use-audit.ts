@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import type { FinanceEvent, LedgerStamp } from "@/lib/events";
 import type { ReconciliationResult } from "@/lib/finance/reconcile";
 import type { FinanceAssessment } from "@/schemas/finance";
+import type { Locale } from "@/lib/i18n/locale";
 
 export type AuditStatus = "idle" | "auditing" | "done" | "error";
 
@@ -32,7 +33,7 @@ export function useAudit() {
   const [state, setState] = useState<AuditState>(INITIAL);
   const runningRef = useRef(false);
 
-  const run = useCallback(async (scenarioId: string) => {
+  const run = useCallback(async (scenarioId: string, locale: Locale) => {
     if (runningRef.current) return;
     runningRef.current = true;
     setState({ ...INITIAL, status: "auditing", scenarioId });
@@ -61,7 +62,7 @@ export function useAudit() {
       const res = await fetch("/api/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenarioId }),
+        body: JSON.stringify({ scenarioId, locale }),
       });
       if (!res.ok || !res.body) {
         setState((s) => ({ ...s, status: "error", error: `Request failed (${res.status})` }));

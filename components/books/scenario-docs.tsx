@@ -1,5 +1,8 @@
+"use client";
+
 import { formatIdr, formatNumber, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { useMessages } from "@/lib/i18n/context";
 import type { ProcurementScenario } from "@/schemas/finance";
 
 /** The raw "books" for a day — always visible, before/after the audit. Presentational only. */
@@ -14,16 +17,17 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 }
 
 export function MealCounts({ scenario }: { scenario: ProcurementScenario }) {
+  const m = useMessages();
   const { enrolled, present, mealsServed, mealsBilled } = scenario.meals;
   const gap = mealsBilled - mealsServed;
   const rows = [
-    { label: "Enrolled", value: enrolled, tone: "text-fg" },
-    { label: "Present (attendance)", value: present, tone: "text-fg" },
-    { label: "Meals served (log)", value: mealsServed, tone: "text-fg" },
-    { label: "Meals billed (invoice)", value: mealsBilled, tone: gap > 0 ? "text-fail" : "text-fg" },
+    { label: m.meal.enrolled, value: enrolled, tone: "text-fg" },
+    { label: m.meal.present, value: present, tone: "text-fg" },
+    { label: m.meal.served, value: mealsServed, tone: "text-fg" },
+    { label: m.meal.billed, value: mealsBilled, tone: gap > 0 ? "text-fail" : "text-fg" },
   ];
   return (
-    <Card title="Meal counts">
+    <Card title={m.books.mealCounts}>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {rows.map((r) => (
           <div key={r.label} className="rounded-lg border bg-panel p-2.5">
@@ -33,26 +37,25 @@ export function MealCounts({ scenario }: { scenario: ProcurementScenario }) {
         ))}
       </div>
       {gap > 0 && (
-        <p className="mt-2 text-xs text-fail">
-          {formatNumber(gap)} portions billed beyond meals served ({formatPercent(gap / mealsBilled)}).
-        </p>
+        <p className="mt-2 text-xs text-fail">{m.books.gapNote(formatNumber(gap), formatPercent(gap / mealsBilled))}</p>
       )}
     </Card>
   );
 }
 
 export function LineItemsTable({ scenario }: { scenario: ProcurementScenario }) {
+  const m = useMessages();
   return (
-    <Card title="Procurement line items">
+    <Card title={m.books.lineItems}>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-[13px]">
           <thead>
             <tr className="text-[10px] tracking-wide text-muted uppercase">
-              <th className="pb-2 font-medium">Item</th>
-              <th className="pb-2 font-medium">Supplier</th>
-              <th className="pb-2 text-right font-medium">Qty</th>
-              <th className="pb-2 text-right font-medium">Unit price</th>
-              <th className="pb-2 text-right font-medium">Reference</th>
+              <th className="pb-2 font-medium">{m.books.colItem}</th>
+              <th className="pb-2 font-medium">{m.books.colSupplier}</th>
+              <th className="pb-2 text-right font-medium">{m.books.colQty}</th>
+              <th className="pb-2 text-right font-medium">{m.books.colUnitPrice}</th>
+              <th className="pb-2 text-right font-medium">{m.books.colReference}</th>
             </tr>
           </thead>
           <tbody>
@@ -80,8 +83,9 @@ export function LineItemsTable({ scenario }: { scenario: ProcurementScenario }) 
 }
 
 export function InvoiceList({ scenario }: { scenario: ProcurementScenario }) {
+  const m = useMessages();
   return (
-    <Card title="Invoices">
+    <Card title={m.books.invoices}>
       <ul className="space-y-1.5">
         {scenario.invoices.map((inv) => (
           <li key={inv.id} className="flex items-center justify-between gap-2 rounded-lg border bg-panel px-3 py-2 text-[13px]">
@@ -91,15 +95,18 @@ export function InvoiceList({ scenario }: { scenario: ProcurementScenario }) {
           </li>
         ))}
       </ul>
-      <p className="mt-2 text-[11px] text-muted">Approval threshold: {formatIdr(scenario.approvalThresholdIdr)}</p>
+      <p className="mt-2 text-[11px] text-muted">
+        {m.books.approvalThreshold}: {formatIdr(scenario.approvalThresholdIdr)}
+      </p>
     </Card>
   );
 }
 
 export function SupplierAwards({ scenario }: { scenario: ProcurementScenario }) {
+  const m = useMessages();
   const total = scenario.awards.reduce((sum, a) => sum + a.awards, 0) || 1;
   return (
-    <Card title="Supplier awards (this month)">
+    <Card title={m.books.awards}>
       <div className="space-y-2">
         {scenario.awards.map((a) => {
           const share = a.awards / total;

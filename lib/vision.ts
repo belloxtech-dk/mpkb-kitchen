@@ -4,6 +4,8 @@ import { getSopRule, SOP_RULES } from "./sop";
 import type { KitchenAlert } from "./events";
 import type { ImageMediaType } from "@/schemas/analyze";
 import { VerdictSchema, verdictJsonSchema, type Verdict } from "@/schemas/verdict";
+import type { Locale } from "@/lib/i18n/locale";
+import { messagesFor } from "@/lib/i18n/dictionary";
 
 const TOOL_NAME = "report_verdict";
 
@@ -36,14 +38,16 @@ export interface VisionParams {
   imageBase64: string;
   mediaType: ImageMediaType;
   zone: string;
+  locale: Locale;
 }
 
 /** Start a streaming vision analysis. Emits text deltas, then a tool_use verdict. */
 export function createVisionStream(params: VisionParams) {
+  const directive = messagesFor(params.locale).aiDirective;
   return getAnthropic().messages.stream({
     model: getModel(),
-    max_tokens: 1600,
-    system: VISION_SYSTEM_PROMPT,
+    max_tokens: 2500,
+    system: `${VISION_SYSTEM_PROMPT}\n\n${directive}`,
     tools: [REPORT_VERDICT_TOOL],
     messages: [
       {
@@ -67,18 +71,19 @@ export function extractVerdict(message: Anthropic.Message): Verdict {
 }
 
 /** Derive a phone alert from the highest-severity violation, if any warrants one. */
-export function deriveAlert(zone: string, verdict: Verdict): KitchenAlert | null {
+export function deriveAlert(zone: string, verdict: Verdict, locale: Locale): KitchenAlert | null {
   const trigger =
     verdict.violations.find((v) => v.severity === "high") ??
     (verdict.overallStatus === "fail" ? verdict.violations[0] : undefined);
   if (!trigger) return null;
 
+  const m = messagesFor(locale);
   const rule = getSopRule(trigger.ruleId);
-  const labelId = rule?.labelId ?? trigger.ruleId;
+  const ruleLabel = (locale === "id" ? rule?.labelId : rule?.label) ?? trigger.ruleId;
   return {
     zone,
-    title: `${rule?.label ?? trigger.ruleId} — ${zone}`,
-    messageId: `⚠️ ${zone}: ${labelId} bermasalah. ${trigger.detail} Tindakan: ${trigger.recommendedAction}`,
+    title: `${ruleLabel} — ${zone}`,
+    messageId: m.alert.bodyTpl(zone, ruleLabel, trigger.detail, trigger.recommendedAction),
     severity: trigger.severity,
     delivered: false,
   };
