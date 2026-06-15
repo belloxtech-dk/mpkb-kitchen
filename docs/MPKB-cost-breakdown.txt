@@ -1,0 +1,51 @@
+Here's the full MPKB cost breakdown:
+
+---
+
+*🔧 ONE-TIME SETUP COSTS*
+
+| Item | Cost (IDR) |
+|---|---|
+| Development (6–8 weeks) | Rp 27.200.000 |
+| CCTV Cameras x3 | Rp 4.080.000 |
+| *TOTAL SETUP* | *Rp 31.280.000* |
+
+---
+
+*📅 MONTHLY RUNNING COSTS*
+
+| Item | Details | Cost/Bulan |
+|---|---|---|
+| Claude API — Kitchen | ~500 panggilan/hari | Rp 612.000 |
+| Claude API — Sekolah | ~100 panggilan/hari | Rp 136.000 |
+| AWS EC2 Server | Backend hosting | Rp 510.000 |
+| PostgreSQL Database | RDS t3.micro | Rp 272.000 |
+| AWS S3 Storage | ~50GB video/bulan | Rp 102.000 |
+| Domain + SSL | Annual divided | Rp 27.000 |
+| *TOTAL/BULAN* | | *Rp 1.660.000* |
+
+---
+
+*🛒 ITEMS TO BUY*
+
+*Hardware*
+•⁠  ⁠3x IP CCTV Camera (indoor, PoE) — Rp 4.080.000
+
+*Software / Subscriptions*
+•⁠  ⁠Anthropic Claude API account
+•⁠  ⁠AWS account (EC2 + RDS + S3)
+•⁠  ⁠Domain name (.com or .my)
+
+*Development*
+•⁠  ⁠1 developer, 6–8 weeks full stack work
+
+---
+
+*💰 YEAR 1 TOTAL ESTIMATE*
+
+| | IDR |
+|---|---|
+| Setup (one-time) | Rp 31.280.000 |
+| Running x12 months | Rp 19.920.000 |
+| *GRAND TOTAL YEAR 1* | *Rp 51.200.000* |
+

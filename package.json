@@ -1,0 +1,45 @@
+{
+  "name": "mpkb-kitchen-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx db/migrate.ts",
+    "db:studio": "drizzle-kit studio",
+    "seed": "tsx db/seed.ts"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild",
+      "sharp"
+    ]
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
+    "better-sqlite3": "^12.10.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.2",
+    "drizzle-zod": "^0.8.3",
+    "next": "^16.2.9",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "zod": "^4.4.3",
+    "zod-to-json-schema": "^3.25.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.1",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "drizzle-kit": "^0.31.10",
+    "tailwindcss": "^4.3.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  }
+}

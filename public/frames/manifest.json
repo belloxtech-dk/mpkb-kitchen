@@ -1,0 +1,8 @@
+{
+  "zones": [
+    { "id": "Zone A", "label": "Zone A · Prep station" },
+    { "id": "Zone B", "label": "Zone B · Cooking line" },
+    { "id": "Zone C", "label": "Zone C · Plating & storage" }
+  ],
+  "frames": []
+}

@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/*
+ * SSOT for design tokens (Tailwind v4 CSS-first theming).
+ * These generate utilities automatically: e.g. --color-pass -> bg-pass / text-pass,
+ * --font-mono -> font-mono. Change a value here and it propagates everywhere.
+ */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", Menlo, monospace;
+
+  /* neutrals */
+  --color-bg: oklch(0.985 0.003 240);
+  --color-surface: oklch(1 0 0);
+  --color-panel: oklch(0.975 0.004 240);
+  --color-border: oklch(0.915 0.006 240);
+  --color-fg: oklch(0.22 0.02 250);
+  --color-muted: oklch(0.55 0.015 250);
+
+  /* accent */
+  --color-accent: oklch(0.55 0.16 255);
+  --color-accent-fg: oklch(0.99 0 0);
+  --color-accent-soft: oklch(0.95 0.03 255);
+
+  /* status: pass / warn / fail */
+  --color-pass: oklch(0.6 0.13 158);
+  --color-pass-soft: oklch(0.95 0.04 158);
+  --color-warn: oklch(0.66 0.12 70);
+  --color-warn-soft: oklch(0.95 0.06 85);
+  --color-fail: oklch(0.57 0.2 22);
+  --color-fail-soft: oklch(0.95 0.04 22);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* CCTV scan line sweeping over a live tile */
+@keyframes scan {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+.scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  animation: scan 2.2s linear infinite;
+}
+
+/* streaming-text caret */
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+.caret::after {
+  content: "▋";
+  margin-left: 1px;
+  animation: caret-blink 1s step-end infinite;
+  color: var(--color-accent);
+}

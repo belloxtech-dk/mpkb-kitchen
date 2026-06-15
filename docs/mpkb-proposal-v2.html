@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>MPKB — Proposal Sistem AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06080f;--surface:#0c1020;--border:#182038;--accent:#3b82f6;--cyan:#06b6d4;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--text:#e8edf8;--muted:#5a6a90;--card:#0e1528;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:.4;pointer-events:none;z-index:0;}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;}
+.orb1{width:500px;height:500px;background:#3b82f615;top:-100px;left:-100px;}
+.orb2{width:400px;height:400px;background:#06b6d410;bottom:200px;right:-80px;}
+.orb3{width:300px;height:300px;background:#10b98108;top:50%;left:40%;}
+section,nav,footer{position:relative;z-index:1;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
+.nav-logo{display:flex;align-items:center;gap:12px;}
+.nav-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;font-family:'Syne',sans-serif;}
+.nav-logo-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:3px;color:var(--text);}
+.nav-logo-sub{font-size:9px;letter-spacing:2px;color:var(--muted);}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;transition:color .2s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-badge{background:var(--accent);color:white;font-size:10px;padding:6px 14px;border-radius:20px;letter-spacing:1px;font-weight:600;}
+.lang-btn{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;transition:all .2s;white-space:nowrap;}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 48px 80px;}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--accent)15;border:1px solid var(--accent)33;border-radius:20px;padding:6px 16px;font-size:10px;letter-spacing:3px;color:var(--accent);margin-bottom:32px;animation:fadeUp .8s ease both;}
+.dot-live{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.5s ease infinite;}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(48px,8vw,100px);font-weight:800;line-height:1;letter-spacing:-2px;margin-bottom:8px;animation:fadeUp .8s .1s ease both;}
+.hero h1 span{display:block;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-subtitle{font-family:'Instrument Serif',serif;font-style:italic;font-size:clamp(18px,2.5vw,28px);color:var(--muted);margin-bottom:16px;animation:fadeUp .8s .2s ease both;}
+.hero-desc{font-size:13px;color:var(--muted);max-width:560px;line-height:1.8;margin-bottom:48px;animation:fadeUp .8s .3s ease both;}
+.hero-stats{display:flex;gap:48px;animation:fadeUp .8s .4s ease both;margin-bottom:56px;}
+.hero-stat{text-align:center;}
+.hero-stat-n{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;}
+.hero-stat-n span{color:var(--accent);}
+.hero-stat-l{font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:4px;}
+.hero-cta{display:flex;gap:16px;animation:fadeUp .8s .5s ease both;}
+.btn-primary{background:var(--accent);color:white;border:none;border-radius:8px;padding:14px 28px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.btn-primary:hover{background:#2563eb;transform:translateY(-2px);box-shadow:0 8px 32px var(--accent)44;}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:14px 28px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+
+/* SECTIONS */
+.section{padding:100px 48px;max-width:1280px;margin:0 auto;}
+.section-tag{font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-tag::before{content:'';width:24px;height:1px;background:var(--accent);}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,52px);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:16px;}
+.section-title em{font-family:'Instrument Serif',serif;font-style:italic;color:var(--accent);}
+.section-desc{font-size:13px;color:var(--muted);max-width:600px;line-height:1.8;margin-bottom:56px;}
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);}
+
+/* MODULES */
+.modules-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.module-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative;overflow:hidden;transition:border-color .3s,transform .3s;}
+.module-card:hover{border-color:var(--accent)55;transform:translateY(-4px);}
+.module-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--cyan));}
+.module-icon{font-size:36px;margin-bottom:16px;}
+.module-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px;}
+.module-desc{font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:24px;}
+.feature-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.feature-list li{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--text);line-height:1.5;}
+.feature-list li::before{content:'→';color:var(--accent);flex-shrink:0;margin-top:1px;}
+
+/* FLOW */
+.flow-container{display:flex;align-items:stretch;gap:0;margin-top:48px;overflow-x:auto;padding-bottom:16px;}
+.flow-step{flex:1;min-width:160px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 20px;text-align:center;transition:border-color .3s;}
+.flow-step:hover{border-color:var(--accent)55;}
+.flow-arrow{display:flex;align-items:center;padding:0 8px;color:var(--accent);font-size:20px;flex-shrink:0;}
+.flow-num{width:32px;height:32px;border-radius:50%;background:var(--accent)22;border:1px solid var(--accent)44;color:var(--accent);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.flow-icon{font-size:24px;margin-bottom:8px;}
+.flow-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:6px;}
+.flow-sub{font-size:10px;color:var(--muted);line-height:1.5;}
+
+/* TECH */
+.tech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.tech-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;transition:all .3s;}
+.tech-card:hover{border-color:var(--cyan)44;}
+.tech-category{font-size:9px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.tech-item{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.tech-item-icon{width:32px;height:32px;background:var(--surface);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tech-item-name{font-size:12px;font-weight:500;}
+.tech-item-desc{font-size:10px;color:var(--muted);margin-top:1px;}
+
+/* COST */
+.cost-layout{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
+.cost-table{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.cost-table-header{padding:16px 24px;background:var(--surface);border-bottom:1px solid var(--border);font-size:10px;letter-spacing:2px;color:var(--muted);display:grid;grid-template-columns:1fr auto auto;gap:16px;}
+.cost-row{padding:14px 24px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;transition:background .2s;font-size:12px;}
+.cost-row:hover{background:var(--surface);}
+.cost-row:last-child{border-bottom:none;}
+.cost-unit{color:var(--muted);font-size:10px;text-align:right;}
+.cost-price{color:var(--accent);font-weight:700;text-align:right;font-family:'Syne',sans-serif;font-size:14px;}
+.cost-total{background:var(--accent)11;border:1px solid var(--accent)33;border-radius:12px;padding:24px;text-align:center;margin-top:16px;}
+.cost-total-label{font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
+.cost-total-amount{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--accent);}
+.cost-total-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+.cost-breakdown{display:flex;flex-direction:column;gap:16px;}
+.cost-phase{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;}
+.cost-phase-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.cost-phase-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}
+.cost-phase-amount{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--green);}
+.cost-phase-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:10px;}
+.cost-phase-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--cyan));}
+.cost-phase-items{font-size:11px;color:var(--muted);line-height:1.8;}
+
+/* TIMELINE */
+.timeline-section-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;}
+.timeline{position:relative;padding-left:32px;}
+.timeline::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--accent),var(--cyan),transparent);}
+.timeline-item{position:relative;margin-bottom:40px;}
+.timeline-dot{position:absolute;left:-28px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 12px var(--accent)66;}
+.timeline-phase{font-size:9px;letter-spacing:2px;color:var(--accent);margin-bottom:4px;}
+.timeline-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;}
+.timeline-desc{font-size:12px;color:var(--muted);line-height:1.7;}
+.deliverable-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;gap:14px;align-items:center;margin-bottom:10px;}
+.deliverable-icon{font-size:22px;}
+.deliverable-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.deliverable-desc{font-size:11px;color:var(--muted);}
+
+/* DEMO */
+.demo-wrapper{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:48px;}
+.demo-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;}
+.demo-dots{display:flex;gap:6px;}
+.demo-dot{width:10px;height:10px;border-radius:50%;}
+.demo-tabs{display:flex;gap:2px;margin-left:auto;}
+.demo-tab{padding:5px 14px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .2s;border:1px solid transparent;color:var(--muted);}
+.demo-tab.active{background:var(--accent)22;border-color:var(--accent)44;color:var(--accent);}
+.demo-content{padding:28px;}
+.cctv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.cctv-cell{background:#020408;border-radius:8px;aspect-ratio:16/10;position:relative;overflow:hidden;border:1px solid var(--border);}
+.cctv-scan{position:absolute;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--cyan)88,transparent);animation:scanDown 3s linear infinite;}
+.cctv-corners span{position:absolute;width:12px;height:12px;border-color:var(--cyan);border-style:solid;}
+.cctv-corners span:nth-child(1){top:6px;left:6px;border-width:2px 0 0 2px;}
+.cctv-corners span:nth-child(2){top:6px;right:6px;border-width:2px 2px 0 0;}
+.cctv-corners span:nth-child(3){bottom:6px;left:6px;border-width:0 0 2px 2px;}
+.cctv-corners span:nth-child(4){bottom:6px;right:6px;border-width:0 2px 2px 0;}
+.cctv-label{position:absolute;top:8px;left:10px;font-size:8px;letter-spacing:2px;color:var(--cyan);}
+.cctv-figure{position:absolute;bottom:14px;border-radius:50% 50% 0 0;}
+.sop-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sop-item{background:var(--surface);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);font-size:11px;}
+.badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:1px;font-family:'DM Mono',monospace;}
+.bp{background:var(--green)22;color:var(--green);border:1px solid var(--green)33;}
+.bf{background:var(--red)22;color:var(--red);border:1px solid var(--red)33;}
+.bw{background:var(--amber)22;color:var(--amber);border:1px solid var(--amber)33;}
+.student-list{display:flex;flex-direction:column;gap:8px;}
+.student-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:16px;transition:border-color .2s;}
+.student-row:hover{border-color:var(--accent)44;}
+.student-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;font-family:'Syne',sans-serif;flex-shrink:0;}
+.student-name{font-size:13px;font-weight:600;flex:1;}
+.student-meta{font-size:10px;color:var(--muted);}
+.bmi-bar-wrap{flex:1;}
+.bmi-bar-bg{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.bmi-bar-fill{height:100%;border-radius:3px;}
+.bmi-val{font-size:14px;font-weight:700;width:36px;text-align:right;font-family:'Syne',sans-serif;}
+
+/* RESULTS */
+.results-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:48px;}
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 20px;text-align:center;border-top:3px solid transparent;transition:transform .3s;}
+.result-card:hover{transform:translateY(-4px);}
+.result-val{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;line-height:1;margin-bottom:6px;}
+.result-label{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.result-sub{font-size:11px;color:var(--muted);margin-top:6px;}
+
+/* AI BOX */
+.ai-explain{background:var(--accent)08;border:1px solid var(--accent)33;border-radius:16px;padding:32px;display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start;margin-top:48px;}
+.ai-avatar{width:48px;height:48px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.ai-text{font-size:13px;color:var(--text);line-height:1.9;}
+.ai-text strong{color:var(--accent);}
+.ai-label{font-size:9px;letter-spacing:3px;color:var(--accent);margin-bottom:10px;display:block;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:40px 48px;display:flex;justify-content:space-between;align-items:center;}
+.footer-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:3px;}
+.footer-copy{font-size:11px;color:var(--muted);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+@keyframes scanDown{0%{top:0%;}100%{top:100%;}}
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease;}
+.fade-in.visible{opacity:1;transform:translateY(0);}
+
+/* MOBILE */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s;}
+.mobile-nav{display:none;}
+@media(max-width:768px){
+  nav{padding:0 20px;height:56px;}
+  .nav-links{display:none;}
+  .nav-badge{display:none;}
+  .nav-logo-sub{display:none;}
+  .hamburger{display:flex!important;}
+  .mobile-nav{display:flex!important;flex-direction:column;position:fixed;top:56px;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;gap:16px;z-index:99;transform:translateY(-110%);transition:transform .3s ease;}
+  .mobile-nav.open{transform:translateY(0);}
+  .mobile-nav a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;border-bottom:1px solid var(--border);}
+  .mobile-nav a:last-child{border-bottom:none;}
+  .hero{padding:100px 24px 60px;}
+  .hero-tag{font-size:8px;letter-spacing:1px;}
+  .hero h1{letter-spacing:-1px;}
+  .hero-stats{gap:24px;flex-wrap:wrap;justify-content:center;}
+  .hero-stat-n{font-size:28px;}
+  .hero-cta{flex-direction:column;width:100%;align-items:stretch;}
+  .btn-primary,.btn-outline{text-align:center;width:100%;}
+  .section{padding:60px 20px;}
+  .modules-grid{grid-template-columns:1fr;}
+  .module-card{padding:24px 20px;}
+  .flow-step{min-width:140px;padding:16px 12px;}
+  .tech-grid{grid-template-columns:1fr;}
+  .cost-layout{grid-template-columns:1fr;}
+  .cost-table-header,.cost-row{grid-template-columns:1fr auto;gap:8px;}
+  .cost-unit{display:none;}
+  .cost-row{padding:12px 16px;font-size:11px;}
+  .cost-table-header{padding:12px 16px;}
+  .cost-total-amount{font-size:32px;}
+  .timeline-section-grid{grid-template-columns:1fr!important;gap:32px!important;}
+  .results-grid{grid-template-columns:1fr 1fr;gap:12px;}
+  .result-val{font-size:28px;}
+  .cctv-grid,.sop-grid{grid-template-columns:1fr;}
+  .demo-content{padding:16px;}
+  .student-row{flex-wrap:wrap;gap:8px;}
+  .ai-explain{grid-template-columns:1fr;gap:16px;padding:20px;}
+  footer{flex-direction:column;gap:20px;text-align:center;padding:32px 20px;}
+  .lang-btn span.lang-text{display:none;}
+}
+@media(max-width:480px){
+  .results-grid{grid-template-columns:1fr;}
+  .hero-stats{gap:16px;}
+  .module-title{font-size:18px;}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">M</div>
+    <div>
+      <div class="nav-logo-text">MPKB</div>
+      <div class="nav-logo-sub" id="nav-sub">SISTEM PEMANTAUAN AI</div>
+    </div>
+  </div>
+  <div class="nav-links" id="nav-links">
+    <a href="#overview" id="nl-1">Ikhtisar</a>
+    <a href="#modules" id="nl-2">Modul</a>
+    <a href="#tech" id="nl-3">Teknologi</a>
+    <a href="#cost" id="nl-4">Biaya</a>
+    <a href="#timeline" id="nl-5">Jadwal</a>
+    <a href="#demo" id="nl-6">Demo</a>
+  </div>
+  <div class="nav-right">
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn">
+      <span id="lang-flag">🇬🇧</span>
+      <span class="lang-text" id="lang-label">English</span>
+    </button>
+    <div class="nav-badge" id="nav-badge">PROPOSAL v1.0</div>
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="#overview" onclick="toggleMenu()" id="mn-1">Ikhtisar</a>
+  <a href="#modules" onclick="toggleMenu()" id="mn-2">Modul</a>
+  <a href="#tech" onclick="toggleMenu()" id="mn-3">Teknologi</a>
+  <a href="#cost" onclick="toggleMenu()" id="mn-4">Biaya</a>
+  <a href="#timeline" onclick="toggleMenu()" id="mn-5">Jadwal</a>
+  <a href="#demo" onclick="toggleMenu()" id="mn-6">Demo</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="overview">
+  <div class="hero-tag"><span class="dot-live"></span><span id="hero-tag">BERTENAGA AI · CLAUDE API · PEMANTAUAN REAL-TIME</span></div>
+  <h1>MPKB<span id="hero-h1">Sistem AI Cerdas</span></h1>
+  <p class="hero-subtitle" id="hero-sub">Platform Kecerdasan Dapur &amp; Sekolah</p>
+  <p class="hero-desc" id="hero-desc">Platform pemantauan AI terpadu menggunakan Claude API dan computer vision untuk menegakkan kepatuhan SOP dapur melalui CCTV dan memantau kemajuan kesehatan &amp; akademik siswa secara real-time.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-n"><span>2</span></div><div class="hero-stat-l" id="s1">MODUL UTAMA</div></div>
+    <div class="hero-stat"><div class="hero-stat-n"><span>3</span></div><div class="hero-stat-l" id="s2">ZONA CCTV</div></div>
+    <div class="hero-stat"><div class="hero-stat-n"><span>∞</span></div><div class="hero-stat-l" id="s3">SISWA DIPANTAU</div></div>
+    <div class="hero-stat"><div class="hero-stat-n"><span>24</span><span style="font-size:18px;color:var(--muted)">/7</span></div><div class="hero-stat-l" id="s4">PEMANTAUAN AI</div></div>
+  </div>
+  <div class="hero-cta">
+    <a href="#demo" class="btn-primary" id="cta1">Lihat Demo Langsung</a>
+    <a href="#cost" class="btn-outline" id="cta2">Lihat Rincian Biaya</a>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MODULES -->
+<section class="section fade-in" id="modules">
+  <div class="section-tag" id="mod-tag">MODUL UTAMA</div>
+  <h2 class="section-title" id="mod-title">Dua Pilar <em>Kecerdasan</em></h2>
+  <p class="section-desc" id="mod-desc">MPKB menggabungkan analisis CCTV real-time untuk kepatuhan dapur dan pemantauan kesehatan siswa secara berkelanjutan — didukung Claude AI di setiap lapisan.</p>
+  <div class="modules-grid">
+    <div class="module-card">
+      <div class="module-icon">🎥</div>
+      <div class="module-title" id="m1t">Modul AI Dapur</div>
+      <p class="module-desc" id="m1d">Rekaman CCTV langsung dari zona dapur dianalisis terus-menerus oleh Claude AI untuk mendeteksi pelanggaran SOP, kegagalan kebersihan, dan risiko keselamatan — sebelum menjadi insiden.</p>
+      <ul class="feature-list">
+        <li id="f1a">Pemantauan CCTV langsung di Zona A, B, C</li>
+        <li id="f1b">Claude Vision API mendeteksi: sarung tangan, jaring rambut, celemek, kebersihan</li>
+        <li id="f1c">Daftar periksa SOP real-time — otomatis LULUS / GAGAL / PERINGATAN</li>
+        <li id="f1d">Unggah video atau gambar untuk analisis AI instan</li>
+        <li id="f1e">Log peringatan pelanggaran dengan stempel waktu</li>
+        <li id="f1f">Skor kepatuhan harian dan laporan tren</li>
+        <li id="f1g">Scan kualitas makanan melalui unggah gambar</li>
+        <li id="f1h">Pelacakan &amp; pengingat log suhu</li>
+      </ul>
+    </div>
+    <div class="module-card" style="--accent:#10b981;">
+      <div class="module-icon">🏫</div>
+      <div class="module-title" id="m2t">Modul Kesehatan Sekolah</div>
+      <p class="module-desc" id="m2d">Pantau perkembangan fisik dan akademik setiap anak dari waktu ke waktu. Claude AI menghasilkan catatan kesehatan, menandai siswa berisiko, dan memberikan wawasan bagi guru dan orang tua.</p>
+      <ul class="feature-list">
+        <li id="f2a">Profil siswa: nama, usia, kelas, metrik kesehatan</li>
+        <li id="f2b">Pemantauan tinggi, berat, BMI dengan indikator tren</li>
+        <li id="f2c">Pemantauan nilai akademik per siswa</li>
+        <li id="f2d">Catatan kesehatan buatan AI (kekurangan / kelebihan / normal)</li>
+        <li id="f2e">Grafik tren BMI seluruh kelas per bulan</li>
+        <li id="f2f">Dashboard penanda siswa berisiko</li>
+        <li id="f2g">Rekomendasi program gizi melalui Claude API</li>
+        <li id="f2h">Pembuatan laporan untuk orang tua &amp; guru</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FLOW -->
+<section class="section fade-in">
+  <div class="section-tag" id="flow-tag">ALUR SISTEM</div>
+  <h2 class="section-title" id="flow-title">Cara Kerja <em>MPKB</em></h2>
+  <p class="section-desc" id="flow-desc">Dari rekaman kamera mentah hingga keputusan cerdas — inilah alur data lengkap sistem MPKB.</p>
+  <div class="flow-container">
+    <div class="flow-step"><div class="flow-num">01</div><div class="flow-icon">📷</div><div class="flow-label" id="fl1">Input</div><div class="flow-sub" id="fs1">Siaran CCTV langsung atau video/gambar yang diunggah dari dapur atau sekolah</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-num">02</div><div class="flow-icon">🔍</div><div class="flow-label" id="fl2">Tangkap Gambar</div><div class="flow-sub" id="fs2">Frame diekstrak dari siaran. Dikodekan Base64 dan disiapkan untuk AI</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-num">03</div><div class="flow-icon">🤖</div><div class="flow-label" id="fl3">Claude API</div><div class="flow-sub" id="fs3">Claude Sonnet menganalisis gambar untuk pelanggaran SOP atau indikator kesehatan</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-num">04</div><div class="flow-icon">📊</div><div class="flow-label" id="fl4">Hasil</div><div class="flow-sub" id="fs4">Putusan LULUS / GAGAL / PERINGATAN dengan penjelasan AI terperinci</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-num">05</div><div class="flow-icon">💾</div><div class="flow-label" id="fl5">Database</div><div class="flow-sub" id="fs5">Hasil disimpan ke DB eksternal untuk riwayat, tren, dan laporan</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-num">06</div><div class="flow-icon">🖥️</div><div class="flow-label" id="fl6">Dashboard</div><div class="flow-sub" id="fs6">Tampilan real-time untuk admin, guru, dan manajer dapur</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TECH -->
+<section class="section fade-in" id="tech">
+  <div class="section-tag" id="tech-tag">TUMPUKAN TEKNOLOGI</div>
+  <h2 class="section-title" id="tech-title">Dibangun Dengan <em>Tujuan</em></h2>
+  <p class="section-desc" id="tech-desc">Setiap teknologi dipilih untuk keandalan, kecepatan, dan integrasi mulus dengan Claude AI — otak dari seluruh sistem.</p>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-category" id="tc1">🤖 AI &amp; Kecerdasan</div>
+      <div class="tech-item"><div class="tech-item-icon">✦</div><div><div class="tech-item-name">Claude Sonnet API</div><div class="tech-item-desc" id="td1">Analisis visi + teks untuk pemeriksaan SOP &amp; catatan kesehatan</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">👁️</div><div><div class="tech-item-name">Computer Vision</div><div class="tech-item-desc" id="td2">Ekstraksi frame &amp; analisis gambar dari CCTV</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">🔎</div><div><div class="tech-item-name">Claude Web Search</div><div class="tech-item-desc" id="td3">Pencarian standar SOP real-time &amp; referensi kesehatan</div></div></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-category" id="tc2">🖥️ Frontend</div>
+      <div class="tech-item"><div class="tech-item-icon">⚛️</div><div><div class="tech-item-name">React.js</div><div class="tech-item-desc" id="td4">UI dashboard interaktif dengan pembaruan real-time</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">📊</div><div><div class="tech-item-name">Recharts / D3</div><div class="tech-item-desc" id="td5">Tren BMI, grafik kepatuhan, analitik</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">🎨</div><div><div class="tech-item-name">Tailwind CSS</div><div class="tech-item-desc" id="td6">Tata letak responsif berbasis utilitas</div></div></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-category" id="tc3">⚙️ Backend &amp; Infrastruktur</div>
+      <div class="tech-item"><div class="tech-item-icon">🟢</div><div><div class="tech-item-name">Node.js / Express</div><div class="tech-item-desc" id="td7">Server API REST menangani permintaan Claude &amp; data</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">🗄️</div><div><div class="tech-item-name">PostgreSQL</div><div class="tech-item-desc" id="td8">Catatan siswa, riwayat kepatuhan, log peringatan</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">🔴</div><div><div class="tech-item-name">Redis</div><div class="tech-item-desc" id="td9">Caching sesi real-time &amp; status siaran langsung</div></div></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-category" id="tc4">📷 Kamera &amp; Streaming</div>
+      <div class="tech-item"><div class="tech-item-icon">📡</div><div><div class="tech-item-name">RTSP / WebRTC</div><div class="tech-item-desc" id="td10">Integrasi protokol siaran CCTV langsung</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">🎞️</div><div><div class="tech-item-name">FFmpeg</div><div class="tech-item-desc" id="td11">Ekstraksi frame dari siaran video berkala</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">☁️</div><div><div class="tech-item-name">AWS S3 / Cloudflare</div><div class="tech-item-desc" id="td12">Penyimpanan klip video &amp; pengiriman CDN</div></div></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-category" id="tc5">🔐 Keamanan &amp; Autentikasi</div>
+      <div class="tech-item"><div class="tech-item-icon">🔑</div><div><div class="tech-item-name">JWT Auth</div><div class="tech-item-desc" id="td13">Login berbasis peran aman (admin, guru, dapur)</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">🛡️</div><div><div class="tech-item-name">HTTPS / TLS</div><div class="tech-item-desc" id="td14">Data terenkripsi dalam transit untuk semua siaran CCTV</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">📋</div><div><div class="tech-item-name">Audit Logging</div><div class="tech-item-desc" id="td15">Semua keputusan AI dicatat dan dapat dilacak</div></div></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-category" id="tc6">🚀 Deployment</div>
+      <div class="tech-item"><div class="tech-item-icon">🐳</div><div><div class="tech-item-name">Docker</div><div class="tech-item-desc" id="td16">Kontainerisasi untuk deployment yang konsisten</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">☁️</div><div><div class="tech-item-name">AWS / Vercel</div><div class="tech-item-desc" id="td17">Hosting cloud scalable untuk web &amp; API</div></div></div>
+      <div class="tech-item"><div class="tech-item-icon">📈</div><div><div class="tech-item-name">Prometheus + Grafana</div><div class="tech-item-desc" id="td18">Pemantauan kesehatan sistem &amp; peringatan uptime</div></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- COST -->
+<section class="section fade-in" id="cost">
+  <div class="section-tag" id="cost-tag">RINCIAN BIAYA</div>
+  <h2 class="section-title" id="cost-title">Investasi &amp; <em>Biaya Operasional</em></h2>
+  <p class="section-desc" id="cost-desc">Penetapan harga transparan menggunakan Claude API sebagai mesin AI. Biaya disesuaikan dengan penggunaan — ideal untuk peluncuran bertahap.</p>
+  <div class="cost-layout">
+    <div>
+      <div class="cost-table">
+        <div class="cost-table-header"><span id="cth1">ITEM</span><span id="cth2">SATUAN</span><span id="cth3">BIAYA (IDR)</span></div>
+        <div class="cost-row"><span id="ci1">Claude API (Sonnet 4) — Dapur</span><span class="cost-unit" id="cu1">~500 panggilan/hari</span><span class="cost-price">~Rp 612.000/bln</span></div>
+        <div class="cost-row"><span id="ci2">Claude API (Sonnet 4) — Sekolah</span><span class="cost-unit" id="cu2">~100 panggilan/hari</span><span class="cost-price">~Rp 136.000/bln</span></div>
+        <div class="cost-row"><span id="ci3">AWS EC2 (Server Backend)</span><span class="cost-unit" id="cu3">t3.medium / 24j</span><span class="cost-price">~Rp 510.000/bln</span></div>
+        <div class="cost-row"><span id="ci4">PostgreSQL (RDS)</span><span class="cost-unit" id="cu4">db.t3.micro</span><span class="cost-price">~Rp 272.000/bln</span></div>
+        <div class="cost-row"><span id="ci5">AWS S3 (Penyimpanan Video)</span><span class="cost-unit" id="cu5">~50 GB/bln</span><span class="cost-price">~Rp 102.000/bln</span></div>
+        <div class="cost-row"><span id="ci6">Domain + SSL</span><span class="cost-unit" id="cu6">Tahunan</span><span class="cost-price">~Rp 27.000/bln</span></div>
+        <div class="cost-row"><span id="ci7">Kamera CCTV (Perangkat Keras)</span><span class="cost-unit" id="cu7">3 kamera, sekali bayar</span><span class="cost-price">~Rp 4.080.000</span></div>
+        <div class="cost-row"><span id="ci8">Pengembangan (Sekali Bayar)</span><span class="cost-unit" id="cu8">6–8 minggu</span><span class="cost-price">~Rp 27.200.000</span></div>
+      </div>
+      <div class="cost-total">
+        <div class="cost-total-label" id="ctl">ESTIMASI BIAYA BULANAN</div>
+        <div class="cost-total-amount">~Rp 1.660.000</div>
+        <div class="cost-total-sub" id="cts">Setelah setup awal ~Rp 31.280.000</div>
+      </div>
+    </div>
+    <div class="cost-breakdown">
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px;" id="pt">Fase Proyek</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.7;" id="pd">Peluncuran bertahap dalam 3 fase untuk mengelola biaya dan memvalidasi hasil sebelum deployment penuh.</p>
+      <div class="cost-phase">
+        <div class="cost-phase-header">
+          <div><div style="font-size:9px;letter-spacing:2px;color:var(--accent);margin-bottom:4px;" id="p1tag">FASE 1 · BULAN 1–2</div><div class="cost-phase-name" id="p1n">Fondasi &amp; MVP Dapur</div></div>
+          <div class="cost-phase-amount">Rp 18.700.000</div>
+        </div>
+        <div class="cost-phase-bar"><div class="cost-phase-bar-fill" style="width:60%;"></div></div>
+        <div class="cost-phase-items" id="p1i">Setup dashboard React · Integrasi Claude API · Koneksi CCTV (1 zona) · Daftar periksa SOP · Peringatan dasar</div>
+      </div>
+      <div class="cost-phase">
+        <div class="cost-phase-header">
+          <div><div style="font-size:9px;letter-spacing:2px;color:var(--cyan);margin-bottom:4px;" id="p2tag">FASE 2 · BULAN 3–4</div><div class="cost-phase-name" id="p2n">Modul Sekolah + Dapur Penuh</div></div>
+          <div class="cost-phase-amount">Rp 10.880.000</div>
+        </div>
+        <div class="cost-phase-bar"><div class="cost-phase-bar-fill" style="width:35%;background:linear-gradient(90deg,var(--cyan),var(--green));"></div></div>
+        <div class="cost-phase-items" id="p2i">Pelacakan kesehatan siswa · Grafik BMI · Hasil akademik · Semua 3 zona CCTV · Pembuatan laporan</div>
+      </div>
+      <div class="cost-phase">
+        <div class="cost-phase-header">
+          <div><div style="font-size:9px;letter-spacing:2px;color:var(--green);margin-bottom:4px;" id="p3tag">FASE 3 · BULAN 5–6</div><div class="cost-phase-name" id="p3n">Penyempurnaan, Deploy &amp; Pelatihan</div></div>
+          <div class="cost-phase-amount">Rp 1.700.000</div>
+        </div>
+        <div class="cost-phase-bar"><div class="cost-phase-bar-fill" style="width:10%;background:linear-gradient(90deg,var(--green),var(--amber));"></div></div>
+        <div class="cost-phase-items" id="p3i">Pengujian pengguna · Pelatihan staf · Optimisasi kinerja · Dukungan go-live</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--accent)33;border-radius:12px;padding:20px;">
+        <div style="font-size:9px;letter-spacing:2px;color:var(--accent);margin-bottom:10px;" id="wcl">✦ MENGAPA CLAUDE API?</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.8;" id="wct">Claude Sonnet 4 menawarkan keseimbangan terbaik antara kemampuan visi, kecepatan, dan biaya. Pada <strong style="color:var(--text)">$3/juta token input</strong>, sistem pemantauan dapur yang menganalisis ~500 gambar/hari hanya menghabiskan sekitar <strong style="color:var(--accent)">USD $1,50/hari</strong> — sangat terjangkau untuk kepatuhan AI kelas enterprise.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TIMELINE -->
+<section class="section fade-in" id="timeline">
+  <div class="section-tag" id="tl-tag">IMPLEMENTASI</div>
+  <h2 class="section-title" id="tl-title">Jalan Menuju <em>Peluncuran</em></h2>
+  <p class="section-desc" id="tl-desc">Rencana realistis 6 bulan dari kick-off hingga deployment penuh — dirancang untuk tim kecil dengan Claude AI sebagai intinya.</p>
+  <div class="timeline-section-grid">
+    <div class="timeline">
+      <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-phase" id="tph1">MINGGU 1–2</div><div class="timeline-title" id="tt1">Setup Proyek &amp; Arsitektur</div><div class="timeline-desc" id="td_1">Definisikan arsitektur sistem. Atur kunci Claude API. Konfigurasi skema database. Scaffold frontend React dan backend Node.js.</div></div>
+      <div class="timeline-item"><div class="timeline-dot" style="background:var(--cyan);"></div><div class="timeline-phase" id="tph2">MINGGU 3–5</div><div class="timeline-title" id="tt2">Integrasi CCTV Dapur</div><div class="timeline-desc" id="td_2">Hubungkan kamera CCTV. Implementasikan ekstraksi frame FFmpeg. Bangun panggilan visi Claude untuk pemeriksaan SOP. Sambungkan dashboard peringatan real-time.</div></div>
+      <div class="timeline-item"><div class="timeline-dot" style="background:var(--green);"></div><div class="timeline-phase" id="tph3">MINGGU 6–8</div><div class="timeline-title" id="tt3">Modul SOP Selesai</div><div class="timeline-desc" id="td_3">Semua zona dapur dipantau. Penilaian kepatuhan aktif. Fitur unggah-untuk-analisis selesai. Pembuatan laporan harian berjalan.</div></div>
+      <div class="timeline-item"><div class="timeline-dot" style="background:var(--amber);"></div><div class="timeline-phase" id="tph4">MINGGU 9–12</div><div class="timeline-title" id="tt4">Modul Kesehatan Sekolah</div><div class="timeline-desc" id="td_4">Database siswa aktif. Pelacakan &amp; grafik BMI terdeploy. Claude menghasilkan catatan kesehatan per siswa. Hasil akademik terintegrasi.</div></div>
+      <div class="timeline-item"><div class="timeline-dot" style="background:var(--green);"></div><div class="timeline-phase" id="tph5">MINGGU 13–16</div><div class="timeline-title" id="tt5">Pengujian &amp; Pelatihan Staf</div><div class="timeline-desc" id="td_5">Pengujian end-to-end di kedua modul. Orientasi staf dapur dan admin sekolah. Pengumpulan umpan balik dan perbaikan bug.</div></div>
+      <div class="timeline-item"><div class="timeline-dot" style="background:#a855f7;"></div><div class="timeline-phase" id="tph6">MINGGU 17–24</div><div class="timeline-title" id="tt6">Deployment Penuh &amp; Go-Live</div><div class="timeline-desc" id="td_6">Deployment produksi ke AWS. Domain dikonfigurasi. Pemantauan sistem aktif. Sistem MPKB penuh beroperasi 24/7.</div></div>
+    </div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px;" id="del-title">Hasil Akhir yang Diserahkan</div>
+      <div class="deliverable-card"><div class="deliverable-icon">🖥️</div><div><div class="deliverable-title" id="d1t">Dashboard Web</div><div class="deliverable-desc" id="d1d">Aplikasi React — tab dapur + sekolah, data langsung</div></div></div>
+      <div class="deliverable-card"><div class="deliverable-icon">🤖</div><div><div class="deliverable-title" id="d2t">Integrasi Claude AI</div><div class="deliverable-desc" id="d2d">Analisis visi untuk CCTV + pembuatan teks kesehatan</div></div></div>
+      <div class="deliverable-card"><div class="deliverable-icon">📷</div><div><div class="deliverable-title" id="d3t">Siaran CCTV Langsung</div><div class="deliverable-desc" id="d3d">Pemantauan 3 zona dengan pemeriksaan SOP real-time</div></div></div>
+      <div class="deliverable-card"><div class="deliverable-icon">📊</div><div><div class="deliverable-title" id="d4t">Analitik &amp; Laporan</div><div class="deliverable-desc" id="d4d">Skor kepatuhan, tren BMI, grafik akademik</div></div></div>
+      <div class="deliverable-card"><div class="deliverable-icon">🔐</div><div><div class="deliverable-title" id="d5t">Sistem Login Aman</div><div class="deliverable-desc" id="d5d">Peran: Admin, Manajer Dapur, Guru</div></div></div>
+      <div class="deliverable-card"><div class="deliverable-icon">📱</div><div><div class="deliverable-title" id="d6t">Responsif Mobile</div><div class="deliverable-desc" id="d6d">Berfungsi di tablet dan ponsel untuk penggunaan lapangan</div></div></div>
+      <div class="deliverable-card"><div class="deliverable-icon">📄</div><div><div class="deliverable-title" id="d7t">Dokumentasi</div><div class="deliverable-desc" id="d7d">Dokumen API lengkap, panduan admin, manual pengguna</div></div></div>
+      <div class="deliverable-card"><div class="deliverable-icon">🎓</div><div><div class="deliverable-title" id="d8t">Sesi Pelatihan</div><div class="deliverable-desc" id="d8d">Orientasi 2 jam untuk semua jenis pengguna</div></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- DEMO -->
+<section class="section fade-in" id="demo">
+  <div class="section-tag" id="demo-tag">PRATINJAU LANGSUNG</div>
+  <h2 class="section-title" id="demo-title"><em>Demo</em> Sistem</h2>
+  <p class="section-desc" id="demo-desc">Pratinjau tampilan dan nuansa dashboard MPKB — antarmuka pemantauan dapur dan kesehatan sekolah.</p>
+  <div class="results-grid">
+    <div class="result-card" style="border-top-color:var(--green);"><div class="result-val" style="color:var(--green);">87%</div><div class="result-label" id="r1l">KEPATUHAN SOP</div><div class="result-sub" id="r1s">Skor dapur hari ini</div></div>
+    <div class="result-card" style="border-top-color:var(--red);"><div class="result-val" style="color:var(--red);">2</div><div class="result-label" id="r2l">PELANGGARAN AKTIF</div><div class="result-sub" id="r2s">Butuh tindakan segera</div></div>
+    <div class="result-card" style="border-top-color:var(--accent);"><div class="result-val" style="color:var(--accent);">18.1</div><div class="result-label" id="r3l">RATA-RATA BMI SISWA</div><div class="result-sub" id="r3s">Dalam rentang sehat</div></div>
+    <div class="result-card" style="border-top-color:var(--amber);"><div class="result-val" style="color:var(--amber);">1</div><div class="result-label" id="r4l">SISWA BERISIKO</div><div class="result-sub" id="r4s">Ditandai minggu ini</div></div>
+  </div>
+  <div class="demo-wrapper">
+    <div class="demo-bar">
+      <div class="demo-dots"><div class="demo-dot" style="background:#ff5f57;"></div><div class="demo-dot" style="background:#febc2e;"></div><div class="demo-dot" style="background:#28c840;"></div></div>
+      <div style="font-size:11px;color:var(--muted);">mpkb.go.id/dashboard</div>
+      <div class="demo-tabs">
+        <div class="demo-tab active" id="tab-k" onclick="showTab('kitchen')">🎥 <span id="tab-kl">Dapur</span></div>
+        <div class="demo-tab" id="tab-s" onclick="showTab('school')">🏫 <span id="tab-sl">Sekolah</span></div>
+      </div>
+    </div>
+    <div class="demo-content">
+      <div id="panel-kitchen">
+        <div class="cctv-grid">
+          <div class="cctv-cell"><div class="cctv-scan" style="animation-duration:2.5s;"></div><div class="cctv-corners"><span></span><span></span><span></span><span></span></div><div class="cctv-label" id="ca">ZONA A · LANGSUNG</div><div class="cctv-figure" style="left:30%;height:36px;background:var(--cyan)22;border:1px solid var(--cyan)44;border-radius:50% 50% 0 0;"></div></div>
+          <div class="cctv-cell"><div class="cctv-scan" style="animation-duration:3s;animation-delay:.5s;"></div><div class="cctv-corners"><span></span><span></span><span></span><span></span></div><div class="cctv-label" id="cb">ZONA B · LANGSUNG</div><div class="cctv-figure" style="left:45%;height:32px;background:var(--cyan)18;border:1px solid var(--cyan)33;border-radius:50% 50% 0 0;"></div></div>
+          <div class="cctv-cell"><div class="cctv-scan" style="animation-duration:3.5s;animation-delay:1s;"></div><div class="cctv-corners"><span></span><span></span><span></span><span></span></div><div class="cctv-label" id="cc">ZONA C · LANGSUNG</div><div class="cctv-figure" style="left:25%;height:38px;background:var(--cyan)15;border:1px solid var(--cyan)33;border-radius:50% 50% 0 0;"></div></div>
+        </div>
+        <div style="font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px;" id="sop-hdr">◈ PEMERIKSAAN KEPATUHAN SOP</div>
+        <div class="sop-grid">
+          <div class="sop-item"><span id="so1">Jaring Rambut / Topi</span><span class="badge bp" id="pass1">LULUS</span></div>
+          <div class="sop-item"><span id="so2">Sarung Tangan</span><span class="badge bp" id="pass2">LULUS</span></div>
+          <div class="sop-item"><span id="so3">Celemek</span><span class="badge bf" id="fail1">GAGAL</span></div>
+          <div class="sop-item"><span id="so4">Cuci Tangan</span><span class="badge bp" id="pass3">LULUS</span></div>
+          <div class="sop-item"><span id="so5">Penyimpanan Makanan</span><span class="badge bw" id="warn1">PERINGATAN</span></div>
+          <div class="sop-item"><span id="so6">Log Suhu</span><span class="badge bf" id="fail2">GAGAL</span></div>
+          <div class="sop-item"><span id="so7">Permukaan Bersih</span><span class="badge bp" id="pass4">LULUS</span></div>
+          <div class="sop-item"><span id="so8">Seragam OK</span><span class="badge bw" id="warn2">PERINGATAN</span></div>
+        </div>
+      </div>
+      <div id="panel-school" style="display:none;">
+        <div style="font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;" id="sch-hdr">◈ MONITOR KESEHATAN SISWA</div>
+        <div class="student-list">
+          <div class="student-row"><div class="student-avatar">AF</div><div style="flex:1"><div class="student-name">Ahmad Farhan</div><div class="student-meta" id="sm1">Usia 9 · Kelas 3A</div></div><div class="bmi-bar-wrap" style="max-width:140px;"><div class="bmi-bar-bg"><div class="bmi-bar-fill" style="width:52%;background:var(--green);"></div></div><div style="font-size:9px;color:var(--muted);margin-top:2px;">132cm · 28kg</div></div><div class="bmi-val" style="color:var(--green);">16.1</div><span class="badge bp">OK</span></div>
+          <div class="student-row"><div class="student-avatar" style="background:linear-gradient(135deg,var(--cyan),var(--green));">NA</div><div style="flex:1"><div class="student-name">Nurul Ain</div><div class="student-meta" id="sm2">Usia 10 · Kelas 4B</div></div><div class="bmi-bar-wrap" style="max-width:140px;"><div class="bmi-bar-bg"><div class="bmi-bar-fill" style="width:68%;background:var(--green);"></div></div><div style="font-size:9px;color:var(--muted);margin-top:2px;">138cm · 35kg</div></div><div class="bmi-val" style="color:var(--green);">18.4</div><span class="badge bp">OK</span></div>
+          <div class="student-row"><div class="student-avatar" style="background:linear-gradient(135deg,var(--red),var(--amber));">SH</div><div style="flex:1"><div class="student-name">Siti Hawa</div><div class="student-meta" id="sm3">Usia 11 · Kelas 5A</div></div><div class="bmi-bar-wrap" style="max-width:140px;"><div class="bmi-bar-bg"><div class="bmi-bar-fill" style="width:85%;background:var(--red);"></div></div><div style="font-size:9px;color:var(--muted);margin-top:2px;">145cm · 42kg</div></div><div class="bmi-val" style="color:var(--red);">20.0</div><span class="badge bf" id="risk-lbl">RISIKO</span></div>
+          <div class="student-row"><div class="student-avatar" style="background:linear-gradient(135deg,var(--amber),#f97316);">MH</div><div style="flex:1"><div class="student-name">Muhammad Haziq</div><div class="student-meta" id="sm4">Usia 8 · Kelas 2C</div></div><div class="bmi-bar-wrap" style="max-width:140px;"><div class="bmi-bar-bg"><div class="bmi-bar-fill" style="width:38%;background:var(--amber);"></div></div><div style="font-size:9px;color:var(--muted);margin-top:2px;">125cm · 24kg</div></div><div class="bmi-val" style="color:var(--amber);">15.4</div><span class="badge bw" id="low-lbl">RENDAH</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ai-explain">
+    <div class="ai-avatar">✦</div>
+    <div>
+      <span class="ai-label" id="ai-lbl">CLAUDE AI — LAPISAN KECERDASAN SISTEM</span>
+      <div class="ai-text" id="ai-txt">MPKB menggunakan <strong>Claude Sonnet API</strong> sebagai lapisan kecerdasan intinya. Untuk dapur, Claude menerima frame kamera berkode base64 setiap 30 detik dan diinstruksikan untuk mendeteksi pelanggaran SOP — sarung tangan hilang, penanganan makanan yang tidak tepat, kegagalan kebersihan. Ia mengembalikan JSON terstruktur dengan putusan, kepercayaan, dan penjelasan untuk setiap zona.<br><br>Untuk modul sekolah, Claude memproses metrik setiap siswa dan menghasilkan <strong>catatan kesehatan yang dipersonalisasi</strong> — mengidentifikasi apakah seorang anak kekurangan berat, kelebihan berat, atau sehat, dan merekomendasikan intervensi.<br><br>Setiap keputusan AI <strong>dicatat, diberi stempel waktu, dan dapat dijelaskan</strong> — memberikan administrator MPKB kemampuan audit penuh atas semua penilaian otomatis.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<footer>
+  <div><div class="footer-logo" style="color:var(--accent);">MPKB</div><div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1px;" id="ft-sub">SISTEM PEMANTAUAN AI — DAPUR &amp; SEKOLAH</div></div>
+  <div style="text-align:center;"><div style="font-size:11px;color:var(--muted);" id="ft-pw">Didukung oleh</div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);">Claude API by Anthropic</div></div>
+  <div class="footer-copy"><div id="ft-v">Proposal v1.0 · Maret 2026</div><div style="margin-top:4px;" id="ft-c">Rahasia — Penggunaan Internal MPKB</div></div>
+</footer>
+
+<script>
+var lang='id';
+var T={
+id:{
+  'nav-sub':'SISTEM PEMANTAUAN AI','nl-1':'Ikhtisar','nl-2':'Modul','nl-3':'Teknologi','nl-4':'Biaya','nl-5':'Jadwal','nl-6':'Demo',
+  'mn-1':'Ikhtisar','mn-2':'Modul','mn-3':'Teknologi','mn-4':'Biaya','mn-5':'Jadwal','mn-6':'Demo',
+  'hero-tag':'BERTENAGA AI · CLAUDE API · PEMANTAUAN REAL-TIME','hero-h1':'Sistem AI Cerdas',
+  'hero-sub':'Platform Kecerdasan Dapur & Sekolah',
+  'hero-desc':'Platform pemantauan AI terpadu menggunakan Claude API dan computer vision untuk menegakkan kepatuhan SOP dapur melalui CCTV dan memantau kemajuan kesehatan & akademik siswa secara real-time.',
+  's1':'MODUL UTAMA','s2':'ZONA CCTV','s3':'SISWA DIPANTAU','s4':'PEMANTAUAN AI',
+  'cta1':'Lihat Demo Langsung','cta2':'Lihat Rincian Biaya',
+  'mod-tag':'MODUL UTAMA','mod-title':'Dua Pilar <em>Kecerdasan</em>','mod-desc':'MPKB menggabungkan analisis CCTV real-time untuk kepatuhan dapur dan pemantauan kesehatan siswa secara berkelanjutan — didukung Claude AI di setiap lapisan.',
+  'm1t':'Modul AI Dapur','m1d':'Rekaman CCTV langsung dari zona dapur dianalisis terus-menerus oleh Claude AI untuk mendeteksi pelanggaran SOP, kegagalan kebersihan, dan risiko keselamatan — sebelum menjadi insiden.',
+  'f1a':'Pemantauan CCTV langsung di Zona A, B, C','f1b':'Claude Vision API mendeteksi: sarung tangan, jaring rambut, celemek, kebersihan','f1c':'Daftar periksa SOP real-time — otomatis LULUS / GAGAL / PERINGATAN','f1d':'Unggah video atau gambar untuk analisis AI instan','f1e':'Log peringatan pelanggaran dengan stempel waktu','f1f':'Skor kepatuhan harian dan laporan tren','f1g':'Scan kualitas makanan melalui unggah gambar','f1h':'Pelacakan & pengingat log suhu',
+  'm2t':'Modul Kesehatan Sekolah','m2d':'Pantau perkembangan fisik dan akademik setiap anak dari waktu ke waktu. Claude AI menghasilkan catatan kesehatan, menandai siswa berisiko, dan memberikan wawasan bagi guru dan orang tua.',
+  'f2a':'Profil siswa: nama, usia, kelas, metrik kesehatan','f2b':'Pemantauan tinggi, berat, BMI dengan indikator tren','f2c':'Pemantauan nilai akademik per siswa','f2d':'Catatan kesehatan buatan AI (kekurangan / kelebihan / normal)','f2e':'Grafik tren BMI seluruh kelas per bulan','f2f':'Dashboard penanda siswa berisiko','f2g':'Rekomendasi program gizi melalui Claude API','f2h':'Pembuatan laporan untuk orang tua & guru',
+  'flow-tag':'ALUR SISTEM','flow-title':'Cara Kerja <em>MPKB</em>','flow-desc':'Dari rekaman kamera mentah hingga keputusan cerdas — inilah alur data lengkap sistem MPKB.',
+  'fl1':'Input','fs1':'Siaran CCTV langsung atau video/gambar yang diunggah dari dapur atau sekolah','fl2':'Tangkap Gambar','fs2':'Frame diekstrak dari siaran. Dikodekan Base64 dan disiapkan untuk AI','fl3':'Claude API','fs3':'Claude Sonnet menganalisis gambar untuk pelanggaran SOP atau indikator kesehatan','fl4':'Hasil','fs4':'Putusan LULUS / GAGAL / PERINGATAN dengan penjelasan AI terperinci','fl5':'Database','fs5':'Hasil disimpan ke DB eksternal untuk riwayat, tren, dan laporan','fl6':'Dashboard','fs6':'Tampilan real-time untuk admin, guru, dan manajer dapur',
+  'tech-tag':'TUMPUKAN TEKNOLOGI','tech-title':'Dibangun Dengan <em>Tujuan</em>','tech-desc':'Setiap teknologi dipilih untuk keandalan, kecepatan, dan integrasi mulus dengan Claude AI — otak dari seluruh sistem.',
+  'tc1':'🤖 AI & Kecerdasan','td1':'Analisis visi + teks untuk pemeriksaan SOP & catatan kesehatan','td2':'Ekstraksi frame & analisis gambar dari CCTV','td3':'Pencarian standar SOP real-time & referensi kesehatan',
+  'tc2':'🖥️ Frontend','td4':'UI dashboard interaktif dengan pembaruan real-time','td5':'Tren BMI, grafik kepatuhan, analitik','td6':'Tata letak responsif berbasis utilitas',
+  'tc3':'⚙️ Backend & Infrastruktur','td7':'Server API REST menangani permintaan Claude & data','td8':'Catatan siswa, riwayat kepatuhan, log peringatan','td9':'Caching sesi real-time & status siaran langsung',
+  'tc4':'📷 Kamera & Streaming','td10':'Integrasi protokol siaran CCTV langsung','td11':'Ekstraksi frame dari siaran video berkala','td12':'Penyimpanan klip video & pengiriman CDN',
+  'tc5':'🔐 Keamanan & Autentikasi','td13':'Login berbasis peran aman (admin, guru, dapur)','td14':'Data terenkripsi dalam transit untuk semua siaran CCTV','td15':'Semua keputusan AI dicatat dan dapat dilacak',
+  'tc6':'🚀 Deployment','td16':'Kontainerisasi untuk deployment yang konsisten','td17':'Hosting cloud scalable untuk web & API','td18':'Pemantauan kesehatan sistem & peringatan uptime',
+  'cost-tag':'RINCIAN BIAYA','cost-title':'Investasi & <em>Biaya Operasional</em>','cost-desc':'Penetapan harga transparan menggunakan Claude API sebagai mesin AI. Biaya disesuaikan dengan penggunaan — ideal untuk peluncuran bertahap.',
+  'cth1':'ITEM','cth2':'SATUAN','cth3':'BIAYA (IDR)',
+  'ci1':'Claude API (Sonnet 4) — Dapur','cu1':'~500 panggilan/hari','ci2':'Claude API (Sonnet 4) — Sekolah','cu2':'~100 panggilan/hari','ci3':'AWS EC2 (Server Backend)','cu3':'t3.medium / 24j','ci4':'PostgreSQL (RDS)','cu4':'db.t3.micro','ci5':'AWS S3 (Penyimpanan Video)','cu5':'~50 GB/bln','ci6':'Domain + SSL','cu6':'Tahunan','ci7':'Kamera CCTV (Perangkat Keras)','cu7':'3 kamera, sekali bayar','ci8':'Pengembangan (Sekali Bayar)','cu8':'6–8 minggu',
+  'ctl':'ESTIMASI BIAYA BULANAN','cts':'Setelah setup awal ~Rp 31.280.000',
+  'pt':'Fase Proyek','pd':'Peluncuran bertahap dalam 3 fase untuk mengelola biaya dan memvalidasi hasil sebelum deployment penuh.',
+  'p1tag':'FASE 1 · BULAN 1–2','p1n':'Fondasi & MVP Dapur','p1i':'Setup dashboard React · Integrasi Claude API · Koneksi CCTV (1 zona) · Daftar periksa SOP · Peringatan dasar',
+  'p2tag':'FASE 2 · BULAN 3–4','p2n':'Modul Sekolah + Dapur Penuh','p2i':'Pelacakan kesehatan siswa · Grafik BMI · Hasil akademik · Semua 3 zona CCTV · Pembuatan laporan',
+  'p3tag':'FASE 3 · BULAN 5–6','p3n':'Penyempurnaan, Deploy & Pelatihan','p3i':'Pengujian pengguna · Pelatihan staf · Optimisasi kinerja · Dukungan go-live',
+  'wcl':'✦ MENGAPA CLAUDE API?','wct':'Claude Sonnet 4 menawarkan keseimbangan terbaik antara kemampuan visi, kecepatan, dan biaya. Pada <strong style="color:var(--text)">$3/juta token input</strong>, sistem pemantauan dapur yang menganalisis ~500 gambar/hari hanya menghabiskan sekitar <strong style="color:var(--accent)">USD $1,50/hari</strong> — sangat terjangkau untuk kepatuhan AI kelas enterprise.',
+  'tl-tag':'IMPLEMENTASI','tl-title':'Jalan Menuju <em>Peluncuran</em>','tl-desc':'Rencana realistis 6 bulan dari kick-off hingga deployment penuh — dirancang untuk tim kecil dengan Claude AI sebagai intinya.',
+  'tph1':'MINGGU 1–2','tt1':'Setup Proyek & Arsitektur','td_1':'Definisikan arsitektur sistem. Atur kunci Claude API. Konfigurasi skema database. Scaffold frontend React dan backend Node.js.',
+  'tph2':'MINGGU 3–5','tt2':'Integrasi CCTV Dapur','td_2':'Hubungkan kamera CCTV. Implementasikan ekstraksi frame FFmpeg. Bangun panggilan visi Claude untuk pemeriksaan SOP. Sambungkan dashboard peringatan real-time.',
+  'tph3':'MINGGU 6–8','tt3':'Modul SOP Selesai','td_3':'Semua zona dapur dipantau. Penilaian kepatuhan aktif. Fitur unggah-untuk-analisis selesai. Pembuatan laporan harian berjalan.',
+  'tph4':'MINGGU 9–12','tt4':'Modul Kesehatan Sekolah','td_4':'Database siswa aktif. Pelacakan & grafik BMI terdeploy. Claude menghasilkan catatan kesehatan per siswa. Hasil akademik terintegrasi.',
+  'tph5':'MINGGU 13–16','tt5':'Pengujian & Pelatihan Staf','td_5':'Pengujian end-to-end di kedua modul. Orientasi staf dapur dan admin sekolah. Pengumpulan umpan balik dan perbaikan bug.',
+  'tph6':'MINGGU 17–24','tt6':'Deployment Penuh & Go-Live','td_6':'Deployment produksi ke AWS. Domain dikonfigurasi. Pemantauan sistem aktif. Sistem MPKB penuh beroperasi 24/7.',
+  'del-title':'Hasil Akhir yang Diserahkan',
+  'd1t':'Dashboard Web','d1d':'Aplikasi React — tab dapur + sekolah, data langsung','d2t':'Integrasi Claude AI','d2d':'Analisis visi untuk CCTV + pembuatan teks kesehatan','d3t':'Siaran CCTV Langsung','d3d':'Pemantauan 3 zona dengan pemeriksaan SOP real-time','d4t':'Analitik & Laporan','d4d':'Skor kepatuhan, tren BMI, grafik akademik','d5t':'Sistem Login Aman','d5d':'Peran: Admin, Manajer Dapur, Guru','d6t':'Responsif Mobile','d6d':'Berfungsi di tablet dan ponsel untuk penggunaan lapangan','d7t':'Dokumentasi','d7d':'Dokumen API lengkap, panduan admin, manual pengguna','d8t':'Sesi Pelatihan','d8d':'Orientasi 2 jam untuk semua jenis pengguna',
+  'demo-tag':'PRATINJAU LANGSUNG','demo-title':'<em>Demo</em> Sistem','demo-desc':'Pratinjau tampilan dan nuansa dashboard MPKB — antarmuka pemantauan dapur dan kesehatan sekolah.',
+  'r1l':'KEPATUHAN SOP','r1s':'Skor dapur hari ini','r2l':'PELANGGARAN AKTIF','r2s':'Butuh tindakan segera','r3l':'RATA-RATA BMI SISWA','r3s':'Dalam rentang sehat','r4l':'SISWA BERISIKO','r4s':'Ditandai minggu ini',
+  'tab-kl':'Dapur','tab-sl':'Sekolah','ca':'ZONA A · LANGSUNG','cb':'ZONA B · LANGSUNG','cc':'ZONA C · LANGSUNG',
+  'sop-hdr':'◈ PEMERIKSAAN KEPATUHAN SOP',
+  'so1':'Jaring Rambut / Topi','so2':'Sarung Tangan','so3':'Celemek','so4':'Cuci Tangan','so5':'Penyimpanan Makanan','so6':'Log Suhu','so7':'Permukaan Bersih','so8':'Seragam OK',
+  'pass1':'LULUS','pass2':'LULUS','pass3':'LULUS','pass4':'LULUS','fail1':'GAGAL','fail2':'GAGAL','warn1':'PERINGATAN','warn2':'PERINGATAN',
+  'sch-hdr':'◈ MONITOR KESEHATAN SISWA','sm1':'Usia 9 · Kelas 3A','sm2':'Usia 10 · Kelas 4B','sm3':'Usia 11 · Kelas 5A','sm4':'Usia 8 · Kelas 2C','risk-lbl':'RISIKO','low-lbl':'RENDAH',
+  'ai-lbl':'CLAUDE AI — LAPISAN KECERDASAN SISTEM',
+  'ai-txt':'MPKB menggunakan <strong>Claude Sonnet API</strong> sebagai lapisan kecerdasan intinya. Untuk dapur, Claude menerima frame kamera berkode base64 setiap 30 detik dan diinstruksikan untuk mendeteksi pelanggaran SOP — sarung tangan hilang, penanganan makanan yang tidak tepat, kegagalan kebersihan. Ia mengembalikan JSON terstruktur dengan putusan, kepercayaan, dan penjelasan untuk setiap zona.<br><br>Untuk modul sekolah, Claude memproses metrik setiap siswa dan menghasilkan <strong>catatan kesehatan yang dipersonalisasi</strong> — mengidentifikasi apakah seorang anak kekurangan berat, kelebihan berat, atau sehat, dan merekomendasikan intervensi.<br><br>Setiap keputusan AI <strong>dicatat, diberi stempel waktu, dan dapat dijelaskan</strong> — memberikan administrator MPKB kemampuan audit penuh atas semua penilaian otomatis.',
+  'ft-sub':'SISTEM PEMANTAUAN AI — DAPUR & SEKOLAH','ft-pw':'Didukung oleh','ft-v':'Proposal v1.0 · Maret 2026','ft-c':'Rahasia — Penggunaan Internal MPKB',
+  'lang-flag':'🇬🇧','lang-label':'English','nav-badge':'PROPOSAL v1.0'
+},
+en:{
+  'nav-sub':'AI MONITORING SYSTEM','nl-1':'Overview','nl-2':'Modules','nl-3':'Tech Stack','nl-4':'Cost','nl-5':'Timeline','nl-6':'Demo',
+  'mn-1':'Overview','mn-2':'Modules','mn-3':'Tech Stack','mn-4':'Cost','mn-5':'Timeline','mn-6':'Demo',
+  'hero-tag':'AI-POWERED · CLAUDE API · REAL-TIME MONITORING','hero-h1':'Smart AI System',
+  'hero-sub':'Kitchen & School Intelligence Platform',
+  'hero-desc':'A unified AI monitoring platform using Claude API and computer vision to enforce kitchen SOP compliance via CCTV and track children\'s health & academic progress in schools — all in real time.',
+  's1':'CORE MODULES','s2':'CCTV ZONES','s3':'STUDENTS TRACKED','s4':'AI MONITORING',
+  'cta1':'View Live Demo','cta2':'See Cost Breakdown',
+  'mod-tag':'CORE MODULES','mod-title':'Two Pillars of <em>Intelligence</em>','mod-desc':'MPKB combines real-time CCTV analysis for kitchen compliance and continuous health monitoring for students — powered by Claude AI at every layer.',
+  'm1t':'Kitchen AI Module','m1d':'Live CCTV feeds across kitchen zones are continuously analyzed by Claude AI to detect SOP violations, hygiene failures, and safety risks — before they become incidents.',
+  'f1a':'Live CCTV monitoring across Zone A, B, C','f1b':'Claude Vision API detects: gloves, hairnet, apron, hygiene compliance','f1c':'Real-time SOP checklist — auto PASS / FAIL / WARN per check','f1d':'Upload video or image for instant AI analysis','f1e':'Violation alert log with timestamps','f1f':'Daily compliance score and trend reports','f1g':'Food quality scan via image upload','f1h':'Temperature log tracking & reminders',
+  'm2t':'School Health Module','m2d':'Track every child\'s physical and academic development over time. Claude AI generates health notes, flags at-risk students, and surfaces insights for teachers and parents.',
+  'f2a':'Student profiles: name, age, class, health metrics','f2b':'Height, weight, BMI tracking with trend indicators','f2c':'Academic score monitoring per student','f2d':'AI-generated health notes (underweight / overweight / healthy)','f2e':'Class-wide BMI trend chart over months','f2f':'At-risk student flagging dashboard','f2g':'Nutritional program recommendations via Claude API','f2h':'Parent & teacher report generation',
+  'flow-tag':'SYSTEM FLOW','flow-title':'How <em>MPKB</em> Works','flow-desc':'From raw camera feed to intelligent decision — here is the complete data flow of the MPKB system.',
+  'fl1':'Input','fs1':'Live CCTV stream or uploaded video/image from kitchen or school','fl2':'Vision Capture','fs2':'Frames extracted from feed. Base64 encoded and prepared for AI','fl3':'Claude API','fs3':'Claude Sonnet analyzes image for SOP violations or health indicators','fl4':'Results','fs4':'PASS / FAIL / WARN verdict with detailed AI explanation','fl5':'Database','fs5':'Results stored to external DB for history, trends, and reports','fl6':'Dashboard','fs6':'Real-time display for admin, teachers, and kitchen managers',
+  'tech-tag':'TECH STACK','tech-title':'Built With <em>Purpose</em>','tech-desc':'Every technology chosen for reliability, speed, and seamless integration with Claude AI — the brain of the entire system.',
+  'tc1':'🤖 AI & Intelligence','td1':'Vision + text analysis for SOP checks & health notes','td2':'Frame extraction & image analysis from CCTV','td3':'Real-time SOP standards lookup & health references',
+  'tc2':'🖥️ Frontend','td4':'Interactive dashboard UI with real-time updates','td5':'BMI trends, compliance charts, analytics graphs','td6':'Utility-first styling for responsive layout',
+  'tc3':'⚙️ Backend & Infrastructure','td7':'REST API server handling Claude requests & data','td8':'Student records, compliance history, alert logs','td9':'Real-time session caching & live feed state',
+  'tc4':'📷 Camera & Streaming','td10':'Live CCTV stream protocol integration','td11':'Frame extraction from video streams at intervals','td12':'Video clip storage & CDN delivery',
+  'tc5':'🔐 Security & Auth','td13':'Secure role-based login (admin, teacher, kitchen)','td14':'Encrypted data in transit for all CCTV streams','td15':'All AI decisions logged and traceable',
+  'tc6':'🚀 Deployment','td16':'Containerized for consistent deployment','td17':'Scalable cloud hosting for web & API','td18':'System health monitoring & uptime alerts',
+  'cost-tag':'COST BREAKDOWN','cost-title':'Investment & <em>Running Costs</em>','cost-desc':'Transparent pricing using Claude API as the AI engine. Costs scale with usage — ideal for phased rollout.',
+  'cth1':'ITEM','cth2':'UNIT','cth3':'COST (IDR)',
+  'ci1':'Claude API (Sonnet 4) — Kitchen','cu1':'~500 calls/day','ci2':'Claude API (Sonnet 4) — School','cu2':'~100 calls/day','ci3':'AWS EC2 (Backend Server)','cu3':'t3.medium / 24h','ci4':'PostgreSQL (RDS)','cu4':'db.t3.micro','ci5':'AWS S3 (Video Storage)','cu5':'~50 GB/mo','ci6':'Domain + SSL','cu6':'Annual','ci7':'CCTV Cameras (Hardware)','cu7':'3 cameras, one-time','ci8':'Development (One-time)','cu8':'6–8 weeks',
+  'ctl':'ESTIMATED MONTHLY RUNNING COST','cts':'After one-time setup of ~Rp 31.280.000',
+  'pt':'Project Phases','pd':'Recommended rollout in 3 phases to manage cost and validate results before full deployment.',
+  'p1tag':'PHASE 1 · MONTH 1–2','p1n':'Foundation & Kitchen MVP','p1i':'React dashboard setup · Claude API integration · CCTV connection (1 zone) · SOP checklist · Basic alerts',
+  'p2tag':'PHASE 2 · MONTH 3–4','p2n':'School Module + Full Kitchen','p2i':'Student health tracking · BMI charts · Academic results · All 3 CCTV zones · Report generation',
+  'p3tag':'PHASE 3 · MONTH 5–6','p3n':'Polish, Deploy & Train','p3i':'User testing · Staff training · Performance optimization · Go-live support',
+  'wcl':'✦ WHY CLAUDE API?','wct':'Claude Sonnet 4 offers the best balance of vision capability, speed, and cost. At <strong style="color:var(--text)">$3/million input tokens</strong>, a kitchen monitoring system analyzing ~500 images/day costs roughly <strong style="color:var(--accent)">USD $1.50/day</strong> — highly affordable for enterprise-grade AI compliance.',
+  'tl-tag':'IMPLEMENTATION','tl-title':'Road to <em>Launch</em>','tl-desc':'A realistic 6-month plan from kick-off to full deployment — built for a small team with Claude AI at its core.',
+  'tph1':'WEEK 1–2','tt1':'Project Setup & Architecture','td_1':'Define system architecture. Set up Claude API keys. Configure database schema. Scaffold React frontend and Node.js backend.',
+  'tph2':'WEEK 3–5','tt2':'Kitchen CCTV Integration','td_2':'Connect CCTV cameras. Implement FFmpeg frame extraction. Build Claude vision calls for SOP checking. Wire up real-time alert dashboard.',
+  'tph3':'WEEK 6–8','tt3':'SOP Module Complete','td_3':'All kitchen zones monitored. Compliance scoring live. Upload-for-analysis feature complete. Daily report generation working.',
+  'tph4':'WEEK 9–12','tt4':'School Health Module','td_4':'Student database live. BMI tracking and charts deployed. Claude generates health notes per student. Academic results integrated.',
+  'tph5':'WEEK 13–16','tt5':'Testing & Staff Training','td_5':'End-to-end testing across both modules. Onboard kitchen staff and school admin. Feedback collection and bug fixes.',
+  'tph6':'WEEK 17–24','tt6':'Full Deployment & Go-Live','td_6':'Production deployment to AWS. Domain configured. System monitoring active. Full MPKB system operational 24/7.',
+  'del-title':'Final Deliverables',
+  'd1t':'Web Dashboard','d1d':'React app — kitchen + school tabs, live data','d2t':'Claude AI Integration','d2d':'Vision analysis for CCTV + health text generation','d3t':'CCTV Live Feed','d3d':'3-zone monitoring with real-time SOP checks','d4t':'Analytics & Reports','d4d':'Compliance scores, BMI trends, academic charts','d5t':'Secure Login System','d5d':'Roles: Admin, Kitchen Manager, Teacher','d6t':'Mobile Responsive','d6d':'Works on tablet and phone for on-floor use','d7t':'Documentation','d7d':'Full API docs, admin guide, user manual','d8t':'Training Session','d8d':'2-hour onboarding for all user types',
+  'demo-tag':'LIVE PREVIEW','demo-title':'System <em>Demo</em>','demo-desc':'A preview of what the MPKB dashboard looks and feels like — both the kitchen monitoring and school health interfaces.',
+  'r1l':'SOP COMPLIANCE','r1s':"Today's kitchen score",'r2l':'ACTIVE VIOLATIONS','r2s':'Needs immediate action','r3l':'AVG STUDENT BMI','r3s':'Within healthy range','r4l':'AT-RISK STUDENTS','r4s':'Flagged this week',
+  'tab-kl':'Kitchen','tab-sl':'School','ca':'ZONE A · LIVE','cb':'ZONE B · LIVE','cc':'ZONE C · LIVE',
+  'sop-hdr':'◈ SOP COMPLIANCE CHECKS',
+  'so1':'Hair Net / Cap','so2':'Gloves Worn','so3':'Apron Worn','so4':'Hand Wash','so5':'Food Storage','so6':'Temp Log','so7':'Surface Clean','so8':'Uniform OK',
+  'pass1':'PASS','pass2':'PASS','pass3':'PASS','pass4':'PASS','fail1':'FAIL','fail2':'FAIL','warn1':'WARN','warn2':'WARN',
+  'sch-hdr':'◈ STUDENT HEALTH MONITOR','sm1':'Age 9 · Class 3A','sm2':'Age 10 · Class 4B','sm3':'Age 11 · Class 5A','sm4':'Age 8 · Class 2C','risk-lbl':'RISK','low-lbl':'LOW',
+  'ai-lbl':'CLAUDE AI — SYSTEM INTELLIGENCE LAYER',
+  'ai-txt':'MPKB uses <strong>Claude Sonnet API</strong> as its core intelligence layer. For the kitchen, Claude receives base64-encoded camera frames every 30 seconds and is prompted to detect specific SOP violations — missing gloves, improper food handling, hygiene failures. It returns structured JSON with a verdict, confidence, and explanation for each zone.<br><br>For the school module, Claude processes each student\'s metrics and generates a <strong>personalised health note</strong> — identifying whether a child is underweight, overweight, or healthy, and recommending intervention.<br><br>Every AI decision is <strong>logged, timestamped, and explainable</strong> — giving MPKB administrators full auditability of all automated assessments.',
+  'ft-sub':'AI MONITORING SYSTEM — KITCHEN & SCHOOL','ft-pw':'Powered by','ft-v':'Proposal v1.0 · March 2026','ft-c':'Confidential — MPKB Internal Use',
+  'lang-flag':'🇮🇩','lang-label':'Indonesia','nav-badge':'PROPOSAL v1.0'
+}};
+
+function applyLang(l){
+  lang=l;
+  document.documentElement.lang=l;
+  var t=T[l];
+  Object.keys(t).forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el)return;
+    el.innerHTML=t[id];
+  });
+  document.getElementById('nav-sub').textContent=t['nav-sub'];
+  document.getElementById('lang-flag').textContent=t['lang-flag'];
+  document.getElementById('lang-label').textContent=t['lang-label'];
+  document.getElementById('nav-badge').textContent=t['nav-badge'];
+  document.title=l==='id'?'MPKB — Proposal Sistem AI':'MPKB — AI Monitoring System Proposal';
+}
+
+function toggleLang(){applyLang(lang==='id'?'en':'id');}
+function toggleMenu(){document.getElementById('mobileNav').classList.toggle('open');}
+function showTab(n){
+  document.getElementById('panel-kitchen').style.display=n==='kitchen'?'block':'none';
+  document.getElementById('panel-school').style.display=n==='school'?'block':'none';
+  document.getElementById('tab-k').classList.toggle('active',n==='kitchen');
+  document.getElementById('tab-s').classList.toggle('active',n==='school');
+}
+var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1});
+document.querySelectorAll('.fade-in').forEach(function(el){obs.observe(el);});
+document.addEventListener('click',function(e){
+  var mn=document.getElementById('mobileNav');
+  var hb=document.getElementById('hamburger');
+  if(mn.classList.contains('open')&&!mn.contains(e.target)&&!hb.contains(e.target))mn.classList.remove('open');
+});
+</script>
+</body>
+</html>
