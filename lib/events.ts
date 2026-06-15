@@ -1,8 +1,10 @@
 import type { Verdict } from "@/schemas/verdict";
+import type { FinanceAssessment } from "@/schemas/finance";
+import type { ReconciliationResult } from "@/lib/finance/reconcile";
 
 /**
- * SSOT for the Server-Sent Events streamed from /api/analyze to the client.
- * Shared by the route (producer) and the useAnalysis hook (consumer).
+ * SSOT for the Server-Sent Events streamed from the analysis/audit routes.
+ * Shared by the routes (producers) and the useAnalysis / useAudit hooks (consumers).
  */
 
 export interface KitchenAlert {
@@ -29,9 +31,18 @@ export type AnalysisEvent =
   | { type: "error"; message: string }
   | { type: "done" };
 
+/** Act 3 — financial-integrity audit stream. */
+export type FinanceEvent =
+  | { type: "status"; state: "started"; scenarioId: string }
+  | { type: "reasoning_delta"; text: string }
+  | { type: "reconciliation"; result: ReconciliationResult }
+  | { type: "assessment"; eventId: string; assessment: FinanceAssessment; ledger: LedgerStamp }
+  | { type: "error"; message: string }
+  | { type: "done" };
+
 export const SSE_DELIMITER = "\n\n";
 
-/** Encode an event as an SSE `data:` frame. */
-export function encodeSse(event: AnalysisEvent): string {
+/** Encode any event object as an SSE `data:` frame. */
+export function encodeSse(event: AnalysisEvent | FinanceEvent): string {
   return `data: ${JSON.stringify(event)}${SSE_DELIMITER}`;
 }

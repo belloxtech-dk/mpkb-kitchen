@@ -1,6 +1,8 @@
 import { sql } from "drizzle-orm";
 import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import type { Verdict } from "@/schemas/verdict";
+import type { FinanceAssessment } from "@/schemas/finance";
+import type { ReconciliationResult } from "@/lib/finance/reconcile";
 
 /** SSOT for the database schema. Drizzle infers all row types from these tables. */
 
@@ -33,6 +35,22 @@ export const ledger = sqliteTable("ledger", {
   hash: text("hash").notNull(),
 });
 
+export const financeEvents = sqliteTable("finance_events", {
+  id: text("id").primaryKey(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+  scenarioId: text("scenario_id").notNull(),
+  kitchen: text("kitchen").notNull(),
+  dateIso: text("date_iso").notNull(),
+  overallRisk: text("overall_risk").notNull(),
+  totalLeakageIdr: real("total_leakage_idr").notNull(),
+  summary: text("summary").notNull(),
+  reconciliation: text("reconciliation", { mode: "json" }).notNull().$type<ReconciliationResult>(),
+  assessment: text("assessment", { mode: "json" }).notNull().$type<FinanceAssessment>(),
+});
+
 export type EventRow = typeof events.$inferSelect;
 export type NewEventRow = typeof events.$inferInsert;
 export type LedgerRow = typeof ledger.$inferSelect;
+export type FinanceEventRow = typeof financeEvents.$inferSelect;

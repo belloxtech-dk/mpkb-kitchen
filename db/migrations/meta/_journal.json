@@ -8,6 +8,13 @@
       "when": 1781486648177,
       "tag": "0000_smart_apocalypse",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1781489869131,
+      "tag": "0001_glossy_zzzax",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,5 @@
 import type { SopStatus, Severity } from "@/schemas/verdict";
+import type { OverallRisk } from "@/schemas/finance";
 
 /** SSOT for mapping verdict statuses/severities to themed classes + labels. */
 
@@ -19,3 +20,10 @@ export function scoreColor(score: number): string {
   if (score >= 60) return "text-warn";
   return "text-fail";
 }
+
+export const RISK_STYLE: Record<OverallRisk, { label: string; text: string; bg: string }> = {
+  low: { label: "LOW RISK", text: "text-pass", bg: "bg-pass-soft" },
+  medium: { label: "MEDIUM RISK", text: "text-warn", bg: "bg-warn-soft" },
+  high: { label: "HIGH RISK", text: "text-fail", bg: "bg-fail-soft" },
+  critical: { label: "CRITICAL", text: "text-fail", bg: "bg-fail-soft" },
+};

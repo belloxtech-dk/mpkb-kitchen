@@ -1,10 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { desc, eq } from "drizzle-orm";
 import { db } from "./index";
-import { events, ledger, type EventRow, type LedgerRow } from "./schema";
+import { events, financeEvents, ledger, type EventRow, type FinanceEventRow, type LedgerRow } from "./schema";
 import { chainHash, GENESIS_HASH, hashPayload } from "@/lib/ledger-hash";
 import type { LedgerStamp } from "@/lib/events";
 import type { Verdict } from "@/schemas/verdict";
+import type { FinanceAssessment, ProcurementScenario } from "@/schemas/finance";
+import type { ReconciliationResult } from "@/lib/finance/reconcile";
 
 /**
  * Repository = the only place that reads/writes domain tables. Keeps DB access
@@ -67,6 +69,83 @@ export function recordSopEvent(input: RecordSopEventInput): { event: EventRow; s
   });
 }
 
+export interface RecordFinanceEventInput {
+  scenario: ProcurementScenario;
+  reconciliation: ReconciliationResult;
+  assessment: FinanceAssessment;
+}
+
+/** The canonical content hashed into the ledger for a finance audit. */
+function financePayload(row: {
+  id: string;
+  scenarioId: string;
+  kitchen: string;
+  dateIso: string;
+  createdAtMs: number;
+  reconciliation: ReconciliationResult;
+  assessment: FinanceAssessment;
+}) {
+  return {
+    kind: "finance_event",
+    refId: row.id,
+    scenarioId: row.scenarioId,
+    kitchen: row.kitchen,
+    dateIso: row.dateIso,
+    createdAt: row.createdAtMs,
+    reconciliation: row.reconciliation,
+    assessment: row.assessment,
+  };
+}
+
+/** Persist a finance audit and append a chained ledger stamp, atomically. */
+export function recordFinanceEvent(input: RecordFinanceEventInput): { event: FinanceEventRow; stamp: LedgerStamp } {
+  const { scenario, reconciliation, assessment } = input;
+  return db.transaction((tx) => {
+    const id = randomUUID();
+    const createdAt = new Date();
+
+    const event = tx
+      .insert(financeEvents)
+      .values({
+        id,
+        createdAt,
+        scenarioId: scenario.id,
+        kitchen: scenario.kitchen,
+        dateIso: scenario.dateIso,
+        overallRisk: assessment.overallRisk,
+        totalLeakageIdr: reconciliation.totalLeakageIdr,
+        summary: assessment.summary,
+        reconciliation,
+        assessment,
+      })
+      .returning()
+      .get();
+
+    const prev = tx.select().from(ledger).orderBy(desc(ledger.seq)).limit(1).get();
+    const prevHash = prev?.hash ?? GENESIS_HASH;
+    const payloadHash = hashPayload(
+      financePayload({
+        id,
+        scenarioId: scenario.id,
+        kitchen: scenario.kitchen,
+        dateIso: scenario.dateIso,
+        createdAtMs: createdAt.getTime(),
+        reconciliation,
+        assessment,
+      }),
+    );
+    const hash = chainHash(prevHash, payloadHash);
+
+    const stamp = tx
+      .insert(ledger)
+      .values({ createdAt, kind: "finance_event", refId: id, payloadHash, prevHash, hash })
+      .returning()
+      .get();
+
+    return { event, stamp: { seq: stamp.seq, hash, prevHash } };
+  });
+}
+
 export function getRecentEvents(limit = 50): EventRow[] {
   return db.select().from(events).orderBy(desc(events.createdAt)).limit(limit).all();
 }
@@ -102,6 +181,26 @@ export function verifyLedger(): { ok: boolean; brokenSeq?: number; reason?: stri
         );
         if (recomputed !== row.payloadHash) {
           return { ok: false, brokenSeq: row.seq, reason: "event content altered after stamping" };
+        }
+      }
+    }
+
+    if (row.kind === "finance_event" && row.refId) {
+      const ev = db.select().from(financeEvents).where(eq(financeEvents.id, row.refId)).get();
+      if (ev) {
+        const recomputed = hashPayload(
+          financePayload({
+            id: ev.id,
+            scenarioId: ev.scenarioId,
+            kitchen: ev.kitchen,
+            dateIso: ev.dateIso,
+            createdAtMs: ev.createdAt.getTime(),
+            reconciliation: ev.reconciliation,
+            assessment: ev.assessment,
+          }),
+        );
+        if (recomputed !== row.payloadHash) {
+          return { ok: false, brokenSeq: row.seq, reason: "finance event content altered after stamping" };
         }
       }
     }

@@ -121,11 +121,22 @@ manager. Then:
 - `schemas/` — Zod SSOT (`verdict`, `analyze`). `db/` — `schema`, `index`, `repo`, `migrate`, `migrations/`.
 
 ## Status & next steps
-- ✅ Act 1 built and verified: streaming Claude vision over uploaded/dropped frames, CCTV-wall UI,
-  SOP checklist, phone-alert card, hash-chained ledger stamp per verdict (foundation for Act 4).
-- ⬜ Act 2 — dedicated "shoot/drag a fresh photo" interactive moment (mostly covered by current upload).
-- ⬜ Act 3 — financial integrity: ingest synthetic procurement (invoice + delivery + attendance + meal
-  counts), reconcile (ghost meals, markup vs reference, duplicates, supplier concentration) via Claude,
-  show the arithmetic. Reuse the same SSE/ledger/SSOT patterns. Needs `db` finance tables + `seed.ts`.
-- ⬜ Act 4 — ledger ticker UI + live tamper demo (verifyLedger already implemented in `db/repo.ts`).
-- ⬜ Swap model to Opus + style polish before the real demo.
+- ✅ Act 1 — `/` Floor: streaming Claude vision over uploaded/dropped frames, CCTV-wall UI, SOP checklist,
+  phone-alert card, hash-chained ledger stamp per verdict. Verified live.
+- ✅ Act 3 — `/books` Books: financial integrity. A **deterministic engine** (`lib/finance/reconcile.ts`)
+  computes exact figures (ghost meals, markup vs reference, duplicate invoices, threshold-gaming, supplier
+  concentration); **Claude narrates + judges** (severity, explanation, recommended action, overall risk).
+  Streams `status → reconciliation → reasoning → assessment → done`; persists to `finance_events` + ledger.
+  Verified live: flagged scenario computes Rp 12.434.000 leakage, AI returns critical risk, ledger sealed.
+  Synthetic scenarios in `lib/finance/scenarios.ts` (one flagged, one clean control) — swap in Andrea's
+  real numbers later.
+- ⬜ Act 2 — dedicated "shoot a fresh photo" moment (mostly covered by Act 1 upload). Low priority.
+- ⬜ Act 4 — ledger ticker UI + live tamper demo. `verifyLedger()` (handles sop + finance content) already
+  implemented in `db/repo.ts`; needs a UI page that lists the chain and a "tamper a row" → re-verify flow.
+- ⬜ Polish: harden the Act 1 drop zone (non-file drops), swap model to Opus, visual pass before the demo.
+
+## Architecture note (applies to all acts)
+The winning pattern, reused per act: **deterministic/structured facts + Claude for streamed reasoning &
+judgement**, delivered over SSE, validated by Zod, sealed into the hash-chained ledger. Act 1 = vision
+verdict; Act 3 = finance reconciliation. New acts should follow the same shape (route streams events from
+`lib/events.ts`; a `use-*` hook consumes them; computed truth stays in TS, the LLM explains/judges).
