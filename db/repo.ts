@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { db } from "./index";
 import { events, financeEvents, ledger, type EventRow, type FinanceEventRow, type LedgerRow } from "./schema";
 import { chainHash, GENESIS_HASH, hashPayload } from "@/lib/ledger-hash";
@@ -308,6 +308,17 @@ export function tamperLedger(): { tampered: boolean } {
   };
   db.update(events).set({ verdict, overallStatus: "pass" }).where(eq(events.id, ev.id)).run();
   return { tampered: true };
+}
+
+/** Wipe all demo data (events, finance audits, ledger) for a clean demo start. */
+export function resetDemoData(): void {
+  db.transaction((tx) => {
+    tx.delete(ledger).run();
+    tx.delete(events).run();
+    tx.delete(financeEvents).run();
+    // restart the ledger seq counter so the next demo begins at #1
+    tx.run(sql`DELETE FROM sqlite_sequence WHERE name = 'ledger'`);
+  });
 }
 
 /** Revert any tampered records to their original sealed content. */

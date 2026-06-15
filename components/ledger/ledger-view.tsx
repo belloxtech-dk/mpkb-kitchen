@@ -27,7 +27,7 @@ export function LedgerView() {
   }, [load]);
 
   const act = useCallback(
-    async (action: "tamper" | "restore") => {
+    async (action: "tamper" | "restore" | "reset") => {
       setBusy(true);
       const res = await fetch("/api/ledger", {
         method: "POST",
@@ -39,6 +39,10 @@ export function LedgerView() {
     },
     [],
   );
+
+  const onReset = useCallback(() => {
+    if (window.confirm(m.ledgerPage.resetConfirm)) void act("reset");
+  }, [act, m.ledgerPage.resetConfirm]);
 
   if (!state) return <div className="text-sm text-muted">…</div>;
 
@@ -132,7 +136,17 @@ export function LedgerView() {
         </div>
       )}
 
-      <p className="text-xs text-muted">{m.ledgerPage.note}</p>
+      <div className="flex items-start justify-between gap-4">
+        <p className="text-xs text-muted">{m.ledgerPage.note}</p>
+        <button
+          type="button"
+          onClick={onReset}
+          disabled={busy || entries.length === 0}
+          className="shrink-0 text-xs text-muted underline-offset-2 transition hover:text-fail hover:underline disabled:opacity-40"
+        >
+          {m.ledgerPage.reset}
+        </button>
+      </div>
     </div>
   );
 }

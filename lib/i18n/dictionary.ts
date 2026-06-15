@@ -48,6 +48,7 @@ const en = {
     analyze: "Analyze",
     analyzing: "Analyzing…",
     rerun: "Re-run",
+    invalidDrop: "Please drop an image file, or use Add frame.",
   },
 
   verdict: {
@@ -113,6 +114,8 @@ const en = {
     reasonAltered: "content no longer matches its seal",
     simulate: "Simulate tampering",
     restore: "Restore",
+    reset: "Reset demo data",
+    resetConfirm: "Clear all sealed records (Floor + Books + Ledger)? This cannot be undone.",
     empty: "No sealed records yet — run an inspection on the Floor or an audit in the Books first.",
     colSeq: "#",
     colTime: "Time",
@@ -196,6 +199,7 @@ const id: Messages = {
     analyze: "Analisis",
     analyzing: "Menganalisis…",
     rerun: "Ulangi",
+    invalidDrop: "Jatuhkan berkas gambar, atau gunakan Tambah frame.",
   },
 
   verdict: {
@@ -261,6 +265,8 @@ const id: Messages = {
     reasonAltered: "konten tidak lagi cocok dengan segelnya",
     simulate: "Simulasikan manipulasi",
     restore: "Pulihkan",
+    reset: "Setel ulang data demo",
+    resetConfirm: "Hapus semua catatan tersegel (Dapur + Keuangan + Buku Besar)? Tindakan ini tidak dapat dibatalkan.",
     empty: "Belum ada catatan tersegel — jalankan inspeksi di Dapur atau audit di Keuangan terlebih dahulu.",
     colSeq: "#",
     colTime: "Waktu",

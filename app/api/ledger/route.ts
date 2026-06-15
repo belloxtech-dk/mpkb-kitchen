@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getLedgerState, restoreLedger, tamperLedger } from "@/db/repo";
+import { getLedgerState, resetDemoData, restoreLedger, tamperLedger } from "@/db/repo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -8,7 +8,7 @@ export async function GET(): Promise<Response> {
   return Response.json(getLedgerState());
 }
 
-const ActionSchema = z.object({ action: z.enum(["tamper", "restore"]) });
+const ActionSchema = z.object({ action: z.enum(["tamper", "restore", "reset"]) });
 
 export async function POST(req: Request): Promise<Response> {
   let raw: unknown;
@@ -24,6 +24,7 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   if (parsed.data.action === "tamper") tamperLedger();
+  else if (parsed.data.action === "reset") resetDemoData();
   else restoreLedger();
 
   return Response.json(getLedgerState());

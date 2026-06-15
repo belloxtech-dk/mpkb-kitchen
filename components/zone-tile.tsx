@@ -21,12 +21,31 @@ interface ZoneTileProps {
 export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnalyze }: ZoneTileProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [dropError, setDropError] = useState(false);
   const m = useMessages();
   const status = result ? STATUS_STYLE[result.overallStatus] : null;
 
-  const pick = (files: FileList | null) => {
-    const file = files?.[0];
-    if (file) onPickFile(file);
+  // Accept only image files; surface a hint when a drop yields no usable image
+  // (e.g. dragging an image from another browser tab provides no File).
+  const submit = (file: File | null | undefined) => {
+    if (file && file.type.startsWith("image/")) {
+      setDropError(false);
+      onPickFile(file);
+    } else {
+      setDropError(true);
+    }
+  };
+
+  const fileFromDrop = (dt: DataTransfer): File | null => {
+    if (dt.files && dt.files.length > 0) return dt.files[0] ?? null;
+    for (let i = 0; i < (dt.items?.length ?? 0); i++) {
+      const item = dt.items[i];
+      if (item && item.kind === "file") {
+        const file = item.getAsFile();
+        if (file) return file;
+      }
+    }
+    return null;
   };
 
   return (
@@ -44,7 +63,7 @@ export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnal
         onDrop={(e) => {
           e.preventDefault();
           setDragOver(false);
-          pick(e.dataTransfer.files);
+          submit(fileFromDrop(e.dataTransfer));
         }}
       >
         {image ? (
@@ -94,12 +113,14 @@ export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnal
         </button>
       </div>
 
+      {dropError && <div className="border-t bg-fail-soft px-3 py-1.5 text-[11px] text-fail">{m.zone.invalidDrop}</div>}
+
       <input
         ref={inputRef}
         type="file"
         accept="image/png,image/jpeg,image/webp,image/gif"
         className="hidden"
-        onChange={(e) => pick(e.target.files)}
+        onChange={(e) => submit(e.target.files?.[0])}
       />
     </div>
   );

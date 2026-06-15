@@ -68,7 +68,13 @@ export function KitchenMonitor() {
 
   const handlePickFile = useCallback(
     async (zoneId: string, file: File) => {
-      const img = await fileToImage(file);
+      let img;
+      try {
+        img = await fileToImage(file);
+      } catch (err) {
+        console.error("Could not read image:", err);
+        return;
+      }
       setImages((prev) => ({ ...prev, [zoneId]: img }));
       setSources((prev) => ({ ...prev, [zoneId]: "upload" }));
       setResults((prev) => {
