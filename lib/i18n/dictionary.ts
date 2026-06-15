@@ -11,6 +11,17 @@ const en = {
   brand: "MPKB · Kitchen Integrity",
   poweredBy: "Powered by Claude",
 
+  fleet: {
+    activeLabel: "kitchens live",
+    searchPlaceholder: "Search kitchens…",
+    scaleLine: (total: string, provinces: string) => `${total} kitchens · ${provinces} provinces`,
+    pilotBadge: "LIVE · PILOT",
+    notActive: "Not yet active",
+    noResults: "No kitchens match.",
+    lockedNote:
+      "Only the pilot kitchen (Lombok) is available for live monitoring in this preview. Other kitchens are enrolled in the programme but not yet provisioned.",
+  },
+
   nav: { floor: "Floor", books: "Books", ledger: "Ledger" },
 
   status: { pass: "PASS", warn: "WARN", fail: "FAIL" },
@@ -160,6 +171,17 @@ export type Messages = typeof en;
 const id: Messages = {
   brand: "MPKB · Integritas Dapur",
   poweredBy: "Didukung oleh Claude",
+
+  fleet: {
+    activeLabel: "dapur aktif",
+    searchPlaceholder: "Cari dapur…",
+    scaleLine: (total: string, provinces: string) => `${total} dapur · ${provinces} provinsi`,
+    pilotBadge: "LIVE · PERCONTOHAN",
+    notActive: "Belum aktif",
+    noResults: "Tidak ada dapur yang cocok.",
+    lockedNote:
+      "Hanya dapur percontohan (Lombok) yang tersedia untuk pemantauan langsung pada pratinjau ini. Dapur lain terdaftar dalam program tetapi belum diaktifkan.",
+  },
 
   nav: { floor: "Dapur", books: "Keuangan", ledger: "Buku Besar" },
 

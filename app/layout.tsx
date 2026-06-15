@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
+import { FleetBar } from "@/components/fleet/fleet-bar";
 import { I18nProvider } from "@/lib/i18n/context";
 import { getServerLocale } from "@/lib/i18n/server";
 import "./globals.css";
@@ -16,6 +17,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-dvh">
         <I18nProvider locale={locale}>
           <SiteHeader />
+          <FleetBar />
           {children}
         </I18nProvider>
       </body>
