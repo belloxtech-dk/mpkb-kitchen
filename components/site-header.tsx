@@ -8,7 +8,7 @@ import { useMessages } from "@/lib/i18n/context";
 import { BrandMark } from "./brand-mark";
 import { LocaleToggle } from "./locale-toggle";
 import { authClient } from "@/lib/auth-client";
-import { isAdmin, isSuperadmin, type Role } from "@/lib/auth/roles";
+import { isAdmin, type Role } from "@/lib/auth/roles";
 
 export function SiteHeader({ email, role }: { email: string; role: Role }) {
   const pathname = usePathname();
@@ -21,7 +21,7 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
     { href: "/ledger", label: m.nav.ledger },
   ];
   if (isAdmin(role)) tabs.push({ href: "/admin", label: m.auth.navAdmin });
-  if (isSuperadmin(role)) tabs.push({ href: "/superadmin", label: m.auth.navSuperadmin });
+  // Note: /superadmin page still exists and is role-gated; it's just not in the nav.
 
   const handleSignOut = async () => {
     await authClient.signOut();
