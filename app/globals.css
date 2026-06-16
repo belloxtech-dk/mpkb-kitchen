@@ -86,3 +86,11 @@
   animation: caret-blink 1s step-end infinite;
   color: var(--color-accent);
 }
+
+/* Hide the scrollbar on horizontally-scrollable mobile strips (Tailwind v4 @utility). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

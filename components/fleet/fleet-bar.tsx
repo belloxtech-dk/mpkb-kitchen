@@ -34,24 +34,24 @@ export function FleetBar() {
   return (
     <div className="border-b bg-panel/60">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-1.5 sm:px-6">
-        <div className="relative">
+        <div className="relative min-w-0 flex-1 sm:flex-none">
           {/* trigger styled as a select control so the chevron clearly reads as a dropdown */}
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
             aria-haspopup="listbox"
             aria-expanded={open}
-            className="flex items-center gap-2 rounded-lg border bg-surface px-2.5 py-1 text-sm transition hover:border-accent"
+            className="flex w-full items-center gap-2 rounded-lg border bg-surface px-2.5 py-1 text-sm transition hover:border-accent sm:w-auto"
           >
             <span className="size-2 shrink-0 rounded-full bg-pass" />
-            <span className="font-medium">{pilot.label}</span>
+            <span className="truncate font-medium">{pilot.label}</span>
             <ChevronDown className={cn("size-4 shrink-0 text-muted transition-transform", open && "rotate-180")} />
           </button>
 
           {open && (
             <>
               <button aria-hidden tabIndex={-1} className="fixed inset-0 z-30 cursor-default" onClick={close} />
-              <div className="absolute left-0 z-40 mt-1 w-80 rounded-xl border bg-surface p-2 shadow-lg">
+              <div className="absolute left-0 z-40 mt-1 w-[min(20rem,calc(100vw-2rem))] rounded-xl border bg-surface p-2 shadow-lg">
                 <div className="relative">
                   <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted" />
                   <input
@@ -119,7 +119,7 @@ export function FleetBar() {
           )}
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs text-muted">
+        <div className="hidden shrink-0 items-center gap-1.5 text-xs text-muted sm:flex">
           <Building2 className="size-3.5 shrink-0" />
           <span>
             <span className="font-mono text-fg">
