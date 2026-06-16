@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useMessages } from "@/lib/i18n/context";
+import { BrandMark } from "./brand-mark";
 import { LocaleToggle } from "./locale-toggle";
 import { authClient } from "@/lib/auth-client";
 import { isAdmin, isSuperadmin, type Role } from "@/lib/auth/roles";
@@ -32,9 +33,7 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
     <header className="sticky top-0 z-20 border-b bg-bg/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-2">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-accent text-sm font-bold text-accent-fg">
-            M
-          </span>
+          <BrandMark />
           <span className="hidden text-sm font-semibold tracking-tight sm:inline">{m.brand}</span>
         </div>
 
