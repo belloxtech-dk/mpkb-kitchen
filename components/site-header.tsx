@@ -37,7 +37,7 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
           <span className="hidden text-sm font-semibold tracking-tight sm:inline">{m.brand}</span>
         </div>
 
-        <nav className="no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto">
+        <nav className="no-scrollbar flex min-w-0 items-center gap-0.5 overflow-x-auto sm:gap-1">
           {tabs.map((tab) => {
             const active = pathname === tab.href;
             return (
