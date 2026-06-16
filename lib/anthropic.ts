@@ -1,5 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { getEnv } from "./config";
+import { getSetting } from "@/db/settings";
+import { DEFAULT_MODEL, MODEL_SETTING_KEY } from "@/lib/models";
 
 let client: Anthropic | null = null;
 
@@ -11,7 +13,11 @@ export function getAnthropic(): Anthropic {
   return client;
 }
 
-/** The configured model id. Sonnet for dev/test; swap ANTHROPIC_MODEL to an Opus id for the demo. */
-export function getModel(): string {
-  return getEnv().ANTHROPIC_MODEL;
+/**
+ * The active model. Resolution order: DB setting (superadmin switcher) →
+ * `ANTHROPIC_MODEL` env → default (Sonnet). Async because it reads the DB.
+ */
+export async function getModel(): Promise<string> {
+  const stored = await getSetting(MODEL_SETTING_KEY);
+  return stored ?? process.env.ANTHROPIC_MODEL ?? DEFAULT_MODEL;
 }

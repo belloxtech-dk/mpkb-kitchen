@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { getAnthropic, getModel } from "@/lib/anthropic";
+import { getAnthropic } from "@/lib/anthropic";
 import { formatIdr } from "@/lib/format";
 import { messagesFor } from "@/lib/i18n/dictionary";
 import type { Locale } from "@/lib/i18n/locale";
@@ -53,12 +53,13 @@ export interface AuditParams {
   scenario: ProcurementScenario;
   reconciliation: ReconciliationResult;
   locale: Locale;
+  model: string;
 }
 
-export function createAuditStream({ scenario, reconciliation, locale }: AuditParams) {
+export function createAuditStream({ scenario, reconciliation, locale, model }: AuditParams) {
   const directive = messagesFor(locale).aiDirective;
   return getAnthropic().messages.stream({
-    model: getModel(),
+    model,
     max_tokens: 3000,
     system: `${AUDIT_SYSTEM_PROMPT}\n\n${directive}`,
     messages: [

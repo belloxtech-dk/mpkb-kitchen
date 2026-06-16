@@ -53,6 +53,15 @@ const en = {
     roleNames: { user: "User", admin: "Admin", superadmin: "Superadmin" },
   },
 
+  superadmin: {
+    modelHeading: "AI model",
+    modelSubtitle: "Used for all kitchen and finance analysis. Sonnet for testing, Opus for the demo.",
+    modelNotes: {
+      "claude-sonnet-4-6": "Faster and cheaper — good for development and testing.",
+      "claude-opus-4-8": "Highest quality — best for the live demo.",
+    },
+  },
+
   nav: { floor: "Floor", books: "Books", ledger: "Ledger" },
 
   status: { pass: "PASS", warn: "WARN", fail: "FAIL" },
@@ -243,6 +252,15 @@ const id: Messages = {
     superadminSubtitle: "Kontrol tingkat sistem.",
     placeholderNote: "Placeholder — disediakan untuk kontrol mendatang.",
     roleNames: { user: "Pengguna", admin: "Admin", superadmin: "Superadmin" },
+  },
+
+  superadmin: {
+    modelHeading: "Model AI",
+    modelSubtitle: "Digunakan untuk semua analisis dapur dan keuangan. Sonnet untuk pengujian, Opus untuk demo.",
+    modelNotes: {
+      "claude-sonnet-4-6": "Lebih cepat dan lebih murah — cocok untuk pengembangan dan pengujian.",
+      "claude-opus-4-8": "Kualitas tertinggi — terbaik untuk demo langsung.",
+    },
   },
 
   nav: { floor: "Dapur", books: "Keuangan", ledger: "Buku Besar" },

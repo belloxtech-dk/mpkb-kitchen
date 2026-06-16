@@ -43,6 +43,13 @@ export const ledger = pgTable("ledger", {
   hash: text("hash").notNull(),
 });
 
+/** Simple key/value app settings (e.g. the active Claude model). */
+export const appSettings = pgTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type EventRow = typeof events.$inferSelect;
 export type NewEventRow = typeof events.$inferInsert;
 export type LedgerRow = typeof ledger.$inferSelect;

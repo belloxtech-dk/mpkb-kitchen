@@ -4,6 +4,7 @@ import { getScenario } from "@/lib/finance/scenarios";
 import { reconcile } from "@/lib/finance/reconcile";
 import { createAuditStream, extractAssessment } from "@/lib/finance/audit";
 import { recordFinanceEvent } from "@/db/repo";
+import { getModel } from "@/lib/anthropic";
 import { LocaleSchema } from "@/lib/i18n/locale";
 
 export const runtime = "nodejs";
@@ -41,7 +42,8 @@ export async function POST(req: Request): Promise<Response> {
         const reconciliation = reconcile(scenario, locale);
         send({ type: "reconciliation", result: reconciliation });
 
-        const audit = createAuditStream({ scenario, reconciliation, locale });
+        const model = await getModel();
+        const audit = createAuditStream({ scenario, reconciliation, locale, model });
         audit.on("text", (delta: string) => send({ type: "reasoning_delta", text: delta }));
 
         const final = await audit.finalMessage();

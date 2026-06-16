@@ -1,17 +1,26 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Menu, X } from "lucide-react";
-import { cn } from "@/lib/cn";
-import { useMessages } from "@/lib/i18n/context";
-import { BrandMark } from "./brand-mark";
-import { LocaleToggle } from "./locale-toggle";
-import { authClient } from "@/lib/auth-client";
-import { isAdmin, type Role } from "@/lib/auth/roles";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { Cpu, LogOut, Menu, X } from 'lucide-react';
+import { cn } from '@/lib/cn';
+import { useMessages } from '@/lib/i18n/context';
+import { BrandMark } from './brand-mark';
+import { LocaleToggle } from './locale-toggle';
+import { authClient } from '@/lib/auth-client';
+import { isAdmin, type Role } from '@/lib/auth/roles';
+import { modelShort } from '@/lib/models';
 
-export function SiteHeader({ email, role }: { email: string; role: Role }) {
+export function SiteHeader({
+  email,
+  role,
+  model,
+}: {
+  email: string;
+  role: Role;
+  model: string;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const m = useMessages();
@@ -23,17 +32,17 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
   }, [pathname]);
 
   const tabs = [
-    { href: "/", label: m.nav.floor },
-    { href: "/books", label: m.nav.books },
-    { href: "/ledger", label: m.nav.ledger },
+    { href: '/', label: m.nav.floor },
+    { href: '/books', label: m.nav.books },
+    { href: '/ledger', label: m.nav.ledger },
   ];
-  if (isAdmin(role)) tabs.push({ href: "/admin", label: m.auth.navAdmin });
+  if (isAdmin(role)) tabs.push({ href: '/admin', label: m.auth.navAdmin });
   // Note: /superadmin page still exists and is role-gated; it's just not in the nav.
 
   const handleSignOut = async () => {
     setMenuOpen(false);
     await authClient.signOut();
-    router.push("/landing");
+    router.push('/landing');
     router.refresh();
   };
 
@@ -42,7 +51,9 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-6">
         <div className="flex shrink-0 items-center gap-2">
           <BrandMark />
-          <span className="hidden text-sm font-semibold tracking-tight sm:inline">{m.brand}</span>
+          <span className="hidden text-sm font-semibold tracking-tight sm:inline">
+            {m.brand}
+          </span>
         </div>
 
         {/* inline nav (sm and up) */}
@@ -54,8 +65,10 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
                 key={tab.href}
                 href={tab.href}
                 className={cn(
-                  "shrink-0 rounded-lg px-2.5 py-1.5 text-sm transition sm:px-3",
-                  active ? "bg-accent text-accent-fg" : "text-muted hover:bg-panel hover:text-fg",
+                  'shrink-0 rounded-lg px-2.5 py-1.5 text-sm transition sm:px-3',
+                  active
+                    ? 'bg-accent text-accent-fg'
+                    : 'text-muted hover:bg-panel hover:text-fg',
                 )}
               >
                 {tab.label}
@@ -65,12 +78,22 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          <span
+            className="hidden items-center gap-1 rounded bg-accent-soft px-1.5 py-0.5 text-[10px] font-semibold text-accent sm:inline-flex"
+            title={model}
+          >
+            <Cpu className="size-3" />
+            {modelShort(model)}
+          </span>
           <LocaleToggle />
           <div className="hidden items-center gap-2 lg:flex">
             <span className="rounded bg-panel px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-muted uppercase">
               {m.auth.roleNames[role]}
             </span>
-            <span className="max-w-[150px] truncate text-xs text-muted" title={email}>
+            <span
+              className="max-w-[150px] truncate text-xs text-muted"
+              title={email}
+            >
               {email}
             </span>
           </div>
@@ -107,8 +130,10 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
                   key={tab.href}
                   href={tab.href}
                   className={cn(
-                    "rounded-lg px-3 py-2 text-sm transition",
-                    active ? "bg-accent text-accent-fg" : "text-fg hover:bg-panel",
+                    'rounded-lg px-3 py-2 text-sm transition',
+                    active
+                      ? 'bg-accent text-accent-fg'
+                      : 'text-fg hover:bg-panel',
                   )}
                 >
                   {tab.label}

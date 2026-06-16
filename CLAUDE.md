@@ -108,6 +108,11 @@ Invite-only, magic-link sign-in. Roles **superadmin / admin / user** (hierarchy:
   admin can invite `user`; superadmin can invite `user`+`admin`. No public sign-up — magic link only signs in
   EXISTING (invited) users.
 - **Bootstrap:** `pnpm seed` upserts jasongalvin@gmail.com as superadmin (idempotent, `db/seed.ts`).
+- **Model switcher (superadmin):** `/superadmin` lets a superadmin pick the Claude model (Sonnet/Opus,
+  SSOT `lib/models.ts`). Stored in the `app_settings` table; `getModel()` resolves DB setting → `ANTHROPIC_MODEL`
+  env → default (Sonnet). `getModel()` is async — routes resolve it and pass `model` into vision/audit. The
+  header shows a current-model badge (resolved in `app/(authed)/layout.tsx`). Flip to Opus for the demo with
+  no redeploy.
 - Email via Brevo HTTP API if `BREVO_API_KEY` set, else the link is console-logged (`lib/auth/email.ts`).
   `EMAIL_FROM` must use a Brevo-authenticated domain; `BETTER_AUTH_URL` builds the link, so in prod it must
   be `https://dapuramanah.com` (not localhost) or emailed links point to the wrong host.

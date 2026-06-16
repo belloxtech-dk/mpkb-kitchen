@@ -3,6 +3,7 @@ import { encodeSse, type AnalysisEvent } from "@/lib/events";
 import { createVisionStream, deriveAlert, extractVerdict } from "@/lib/vision";
 import { sendTelegramAlert } from "@/lib/telegram";
 import { recordSopEvent } from "@/db/repo";
+import { getModel } from "@/lib/anthropic";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,7 +29,8 @@ export async function POST(req: Request): Promise<Response> {
       try {
         send({ type: "status", state: "started", zone, source });
 
-        const vision = createVisionStream({ imageBase64, mediaType, zone, locale });
+        const model = await getModel();
+        const vision = createVisionStream({ imageBase64, mediaType, zone, locale, model });
         vision.on("text", (delta: string) => send({ type: "reasoning_delta", text: delta }));
 
         const final = await vision.finalMessage();

@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { getAnthropic, getModel } from "./anthropic";
+import { getAnthropic } from "./anthropic";
 import { getSopRule, SOP_RULES } from "./sop";
 import type { KitchenAlert } from "./events";
 import type { ImageMediaType } from "@/schemas/analyze";
@@ -39,13 +39,14 @@ export interface VisionParams {
   mediaType: ImageMediaType;
   zone: string;
   locale: Locale;
+  model: string;
 }
 
 /** Start a streaming vision analysis. Emits text deltas, then a tool_use verdict. */
 export function createVisionStream(params: VisionParams) {
   const directive = messagesFor(params.locale).aiDirective;
   return getAnthropic().messages.stream({
-    model: getModel(),
+    model: params.model,
     max_tokens: 2500,
     system: `${VISION_SYSTEM_PROMPT}\n\n${directive}`,
     tools: [REPORT_VERDICT_TOOL],
