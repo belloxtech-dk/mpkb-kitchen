@@ -7,7 +7,7 @@ export default async function LandingPage() {
   const m = await getServerMessages();
   return (
     <main className="flex min-h-dvh flex-col">
-      <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+      <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
         <div className="flex items-center gap-2">
           <BrandMark />
           <span className="text-sm font-semibold tracking-tight">
