@@ -8,12 +8,26 @@ import { account, session, user, verification } from "@/db/auth-schema";
 import { ac, roles } from "@/lib/auth/permissions";
 import { sendMagicLinkEmail } from "@/lib/auth/email";
 
+const BASE_URL = process.env.BETTER_AUTH_URL ?? "http://localhost:3786";
+
+/** Trust both the apex and www variants of the configured base URL (port preserved). */
+function buildTrustedOrigins(base: string): string[] {
+  try {
+    const u = new URL(base);
+    const apexHost = u.host.replace(/^www\./, "");
+    return [`${u.protocol}//${apexHost}`, `${u.protocol}//www.${apexHost}`];
+  } catch {
+    return [base];
+  }
+}
+
 /**
  * Server auth instance. Invite-only (magic link with disableSignUp; no password
  * sign-up). Roles: superadmin / admin / user via the admin plugin.
  */
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3786",
+  baseURL: BASE_URL,
+  trustedOrigins: buildTrustedOrigins(BASE_URL),
   secret: process.env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, { provider: "pg", schema: { user, session, account, verification } }),
   emailAndPassword: { enabled: false },

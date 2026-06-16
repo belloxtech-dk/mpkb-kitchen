@@ -12,15 +12,6 @@
     "db:studio": "drizzle-kit studio",
     "seed": "tsx --env-file=.env.local db/seed.ts"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "sharp"
-    ],
-    "ignoredOptionalDependencies": [
-      "better-sqlite3"
-    ]
-  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",
     "better-auth": "^1.6.18",

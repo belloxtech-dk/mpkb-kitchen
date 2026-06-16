@@ -184,7 +184,7 @@ manager. Then:
 - ✅ Demo hardening: Act 1 drop zone hardened (non-file drops); "Reset demo data" control on the Ledger
   tab (clears events/finance/ledger via `TRUNCATE … RESTART IDENTITY`); fleet context bar (multi-kitchen
   illusion). ⬜ still: wire a real Telegram alert if creds provided.
-- ✅ Push 1: migrated SQLite → PostgreSQL (pg + drizzle node-postgres; repo is async).
+- ✅ Push 1: PostgreSQL (pg + drizzle node-postgres; async repo).
 - ✅ Push 2: Better Auth — invite-only, magic-link, roles superadmin/admin/user, gated app + admin/superadmin
   pages, superadmin seeded. See the Auth section above.
 - ⬜ Polish: swap model to Opus for the demo; visual pass; Andrea's real photos + procurement numbers.

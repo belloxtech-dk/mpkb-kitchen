@@ -1,0 +1,4 @@
+# pnpm settings (pnpm v11 no longer reads the "pnpm" field in package.json).
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
