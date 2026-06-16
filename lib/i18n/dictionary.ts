@@ -104,6 +104,7 @@ const en = {
     reasoningLabel: "AI observation",
     reasoningActive: "Analyzing frame…",
     reasoningIdle: "Awaiting a frame to inspect.",
+    feedHint: "Sample CCTV feed — click a tile to pause, Analyze to inspect a frame, or drop your own kitchen photo on any zone.",
   },
 
   zone: {
@@ -115,6 +116,12 @@ const en = {
     analyzing: "Analyzing…",
     rerun: "Re-run",
     invalidDrop: "Please drop an image file, or use Add frame.",
+    rec: "REC",
+    paused: "PAUSED",
+    scanning: "ANALYZING",
+    demoFeed: "Demo feed",
+    yourFrame: "Your frame",
+    tapResume: "Tap to resume",
   },
 
   verdict: {
@@ -321,6 +328,7 @@ const id: Messages = {
     reasoningLabel: "Observasi AI",
     reasoningActive: "Menganalisis frame…",
     reasoningIdle: "Menunggu frame untuk diperiksa.",
+    feedHint: "Umpan CCTV contoh — klik tile untuk jeda, Analisis untuk memeriksa frame, atau jatuhkan foto dapur Anda di zona mana pun.",
   },
 
   zone: {
@@ -332,6 +340,12 @@ const id: Messages = {
     analyzing: "Menganalisis…",
     rerun: "Ulangi",
     invalidDrop: "Jatuhkan berkas gambar, atau gunakan Tambah frame.",
+    rec: "REC",
+    paused: "JEDA",
+    scanning: "MENGANALISIS",
+    demoFeed: "Umpan demo",
+    yourFrame: "Frame Anda",
+    tapResume: "Ketuk untuk lanjut",
   },
 
   verdict: {

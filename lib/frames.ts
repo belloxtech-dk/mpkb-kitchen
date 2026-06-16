@@ -1,33 +1,24 @@
 /**
  * Client-safe types + loader for the staged CCTV frames manifest.
- * Drop Andrea's kitchen photos into /public/frames and list them in manifest.json;
- * the wall auto-populates. With no frames, zones accept drag-and-drop / upload.
+ * Each zone has an ordered list of frames in /public/frames; the Floor cycles
+ * through them to simulate a live feed. Swap the files (and the manifest) for
+ * Andrea's real kitchen photos. With no frames, a zone falls back to upload.
  */
 
 export interface ZoneDef {
   id: string;
   label: string;
-}
-
-export interface FrameDef {
-  file: string;
-  zone: string;
-  label?: string;
+  frames: string[];
 }
 
 export interface FrameManifest {
   zones: ZoneDef[];
-  frames: FrameDef[];
 }
 
 export const MANIFEST_URL = "/frames/manifest.json";
 
 export async function loadManifest(): Promise<FrameManifest> {
   const res = await fetch(MANIFEST_URL, { cache: "no-store" });
-  if (!res.ok) return { zones: [], frames: [] };
+  if (!res.ok) return { zones: [] };
   return (await res.json()) as FrameManifest;
-}
-
-export function framesForZone(manifest: FrameManifest, zoneId: string): FrameDef[] {
-  return manifest.frames.filter((f) => f.zone === zoneId);
 }

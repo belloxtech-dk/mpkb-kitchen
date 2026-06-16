@@ -56,8 +56,10 @@ The wow = **streaming Claude's actual observations in real time** (show the reas
   Day 3 = Act 4 ledger/tamper + Telegram + polish.
 
 ### Need from Andrea (for authenticity)
-- 10–15 kitchen photos: mix of compliant + violations (no hairnet, bare hands on raw food, spill, food
-  left uncovered). Scaffold with placeholders/stock until they arrive.
+- **9 kitchen frames: 3 per zone × 3 zones** (`public/frames/{a,b,c}{1,2,3}.jpg`, 16:9 ~1280×720). Per zone,
+  the 3 frames are the SAME camera angle (slightly different moments) so the cycling reads as footage; plant
+  a clear violation in one frame (e.g. frame 2). Currently sharp-generated **placeholders** — replace the
+  files (same names) and they slot straight in. Listed in `public/frames/manifest.json` (frames-per-zone).
 - One realistic day of procurement numbers: a supplier invoice, delivery note, enrollment + attendance,
   meal count. Real local prices/quantities make Act 3 land.
 
@@ -161,7 +163,9 @@ manager. Then:
      email real links.
 3. Open the app, drop a kitchen photo on a zone tile (or click Add frame) → watch Claude narrate and the
    SOP checklist fill in. "Run sweep" analyzes all populated zones.
-- Staged auto-cycling: drop photos into `public/frames/` and list them in `public/frames/manifest.json`.
+- CCTV feed: each zone cycles its frames (~2.2s) with a live timestamp/REC/scanline; click a tile to
+  pause, Analyze freezes + inspects the current frame, upload replaces a zone's feed. Cosmetic only — still
+  one Claude call on one frame. Frames in `public/frames/` per `manifest.json` (frames-per-zone).
 - Verified working: typecheck clean, prod build green, SSE streams `status → reasoning_delta* → verdict →
   alert? → done`, and degrades to a clean `error` event if the key is missing.
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ImagePlus } from "lucide-react";
+import { ImagePlus, Pause, Play } from "lucide-react";
 import { STATUS_STYLE } from "@/lib/status-styles";
 import { cn } from "@/lib/cn";
 import { useMessages } from "@/lib/i18n/context";
@@ -11,23 +11,37 @@ import type { Verdict } from "@/schemas/verdict";
 
 interface ZoneTileProps {
   zone: ZoneDef;
-  image: LoadedImage | undefined;
+  frame: LoadedImage | undefined;
+  source: "demo" | "upload";
   result: Verdict | undefined;
-  active: boolean;
+  analyzing: boolean;
+  paused: boolean;
   busy: boolean;
-  onPickFile: (file: File) => void;
+  timestamp: string;
+  onTogglePause: () => void;
   onAnalyze: () => void;
+  onPickFile: (file: File) => void;
 }
 
-export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnalyze }: ZoneTileProps) {
+export function ZoneTile({
+  zone,
+  frame,
+  source,
+  result,
+  analyzing,
+  paused,
+  busy,
+  timestamp,
+  onTogglePause,
+  onAnalyze,
+  onPickFile,
+}: ZoneTileProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
   const [dropError, setDropError] = useState(false);
   const m = useMessages();
   const status = result ? STATUS_STYLE[result.overallStatus] : null;
 
-  // Accept only image files; surface a hint when a drop yields no usable image
-  // (e.g. dragging an image from another browser tab provides no File).
   const submit = (file: File | null | undefined) => {
     if (file && file.type.startsWith("image/")) {
       setDropError(false);
@@ -52,10 +66,7 @@ export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnal
   return (
     <div className="overflow-hidden rounded-xl border bg-surface">
       <div
-        className={cn(
-          "relative aspect-video bg-panel",
-          dragOver && "ring-2 ring-accent ring-inset",
-        )}
+        className={cn("group relative aspect-video bg-[#141a26]", dragOver && "ring-2 ring-accent ring-inset")}
         onDragOver={(e) => {
           e.preventDefault();
           setDragOver(true);
@@ -66,32 +77,82 @@ export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnal
           setDragOver(false);
           submit(fileFromDrop(e.dataTransfer));
         }}
+        onClick={() => {
+          if (frame && !analyzing) onTogglePause();
+        }}
+        role={frame ? "button" : undefined}
       >
-        {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={image.dataUrl} alt={zone.label} className="size-full object-cover" />
+        {frame ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={frame.dataUrl}
+              alt={zone.label}
+              className="size-full object-cover brightness-95 contrast-[1.08] grayscale-[0.12]"
+            />
+            <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_70px_rgba(0,0,0,0.55)]" />
+            <div className="scanline" />
+
+            {/* label + live/paused/analyzing indicator */}
+            <div className="absolute top-2 left-2 flex items-center gap-1.5">
+              <span className="rounded bg-black/55 px-1.5 py-0.5 font-mono text-[10px] tracking-wide text-white/90">
+                {zone.label}
+              </span>
+              {analyzing ? (
+                <span className="flex items-center gap-1 rounded bg-accent/80 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-white">
+                  <span className="size-1.5 animate-pulse rounded-full bg-white" />
+                  {m.zone.scanning}
+                </span>
+              ) : paused ? (
+                <span className="rounded bg-black/55 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-white/80">
+                  ❚❚ {m.zone.paused}
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 rounded bg-black/55 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-red-400">
+                  <span className="size-1.5 animate-pulse rounded-full bg-red-500" />
+                  {m.zone.rec}
+                </span>
+              )}
+            </div>
+
+            {/* timestamp + verdict badge */}
+            <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
+              <span className="rounded bg-black/55 px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-white/85">
+                {timestamp}
+              </span>
+              {status && result && (
+                <span className={cn("rounded px-1.5 py-0.5 text-[10px] font-semibold", status.bg, status.text)}>
+                  {m.status[result.overallStatus]} · {Math.round(result.complianceScore)}
+                </span>
+              )}
+            </div>
+
+            {/* feed-source tag */}
+            <span className="absolute bottom-2 left-2 rounded bg-black/55 px-1.5 py-0.5 font-mono text-[9px] tracking-wide text-white/70 uppercase">
+              {source === "upload" ? m.zone.yourFrame : m.zone.demoFeed}
+            </span>
+
+            {/* hover pause/play affordance */}
+            {!analyzing && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition group-hover:opacity-100">
+                <span className="flex size-10 items-center justify-center rounded-full bg-black/50 text-white">
+                  {paused ? <Play className="size-5" /> : <Pause className="size-5" />}
+                </span>
+              </div>
+            )}
+          </>
         ) : (
           <button
             type="button"
-            onClick={() => inputRef.current?.click()}
+            onClick={(e) => {
+              e.stopPropagation();
+              inputRef.current?.click();
+            }}
             className="flex size-full flex-col items-center justify-center gap-1.5 text-center text-muted transition hover:text-accent"
           >
             <ImagePlus className="size-6" />
             <span className="text-xs">{m.zone.addHint}</span>
           </button>
-        )}
-
-        {active && <div className="scanline" />}
-
-        <div className="absolute top-2 left-2 rounded-md bg-fg/70 px-2 py-0.5 font-mono text-[10px] tracking-wide text-surface">
-          {zone.label}
-          {active && <span className="ml-1.5 text-accent-soft">● {m.zone.live}</span>}
-        </div>
-
-        {status && result && (
-          <div className={cn("absolute top-2 right-2 rounded-md px-2 py-0.5 text-[10px] font-semibold", status.bg, status.text)}>
-            {m.status[result.overallStatus]} · {Math.round(result.complianceScore)}
-          </div>
         )}
       </div>
 
@@ -102,15 +163,15 @@ export function ZoneTile({ zone, image, result, active, busy, onPickFile, onAnal
           disabled={busy}
           className="text-xs text-muted transition hover:text-fg disabled:opacity-40"
         >
-          {image ? m.zone.replace : m.zone.add}
+          {frame ? m.zone.replace : m.zone.add}
         </button>
         <button
           type="button"
           onClick={onAnalyze}
-          disabled={!image || busy}
+          disabled={!frame || busy}
           className="rounded-md bg-accent px-3 py-1 text-xs font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-40"
         >
-          {active ? m.zone.analyzing : result ? m.zone.rerun : m.zone.analyze}
+          {analyzing ? m.zone.analyzing : result ? m.zone.rerun : m.zone.analyze}
         </button>
       </div>
 
