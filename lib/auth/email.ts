@@ -1,8 +1,12 @@
 /**
- * Magic-link email delivery via Brevo (transactional HTTP API). If BREVO_API_KEY
- * is unset, the link is logged to the server console (dev fallback) so the flow
- * is testable without an email provider.
+ * Magic-link email delivery via Brevo (transactional HTTP API).
+ *
+ * The link is a bearer credential, so it is ONLY ever printed to the console in
+ * development. In production it is sent via Brevo and never logged; a send failure
+ * logs the error (not the link).
  */
+
+const isDev = process.env.NODE_ENV !== "production";
 
 interface Sender {
   name?: string;
@@ -16,12 +20,18 @@ function parseSender(from: string): Sender {
   return { email: from.trim() };
 }
 
+/** Dev-only convenience: print the link so the flow is testable without an email provider. */
+function logLinkInDev(email: string, url: string): void {
+  if (isDev) console.log(`\n🔗 [magic-link] sign-in link for ${email}:\n${url}\n`);
+}
+
 export async function sendMagicLinkEmail(email: string, url: string): Promise<void> {
   const key = process.env.BREVO_API_KEY;
   const from = process.env.EMAIL_FROM || "Dapur Amanah <login@dapuramanah.com>";
 
   if (!key) {
-    console.log(`\n🔗 [magic-link] sign-in link for ${email}:\n${url}\n`);
+    if (isDev) logLinkInDev(email, url);
+    else console.error("[magic-link] BREVO_API_KEY is not set — cannot send the sign-in email.");
     return;
   }
 
@@ -40,10 +50,10 @@ export async function sendMagicLinkEmail(email: string, url: string): Promise<vo
     });
     if (!res.ok) {
       console.error("[magic-link] Brevo error:", res.status, await res.text());
-      console.log(`🔗 [magic-link] ${email}: ${url}`);
+      logLinkInDev(email, url); // dev only — never log the link in production
     }
   } catch (err) {
     console.error("[magic-link] send failed:", err);
-    console.log(`🔗 [magic-link] ${email}: ${url}`);
+    logLinkInDev(email, url); // dev only
   }
 }

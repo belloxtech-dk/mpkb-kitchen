@@ -24,7 +24,7 @@ const en = {
 
   auth: {
     signInTitle: "Sign in to MPKB",
-    signInSubtitle: "Enter your email — we'll send a secure sign-in link.",
+    signInSubtitle: "Invite-only. If your email has been invited, we'll send a sign-in link.",
     emailLabel: "Email address",
     emailPlaceholder: "you@example.com",
     sendLink: "Send sign-in link",
@@ -216,7 +216,7 @@ const id: Messages = {
 
   auth: {
     signInTitle: "Masuk ke MPKB",
-    signInSubtitle: "Masukkan email Anda — kami akan mengirim tautan masuk yang aman.",
+    signInSubtitle: "Hanya dengan undangan. Jika email Anda telah diundang, kami akan mengirim tautan masuk.",
     emailLabel: "Alamat email",
     emailPlaceholder: "anda@contoh.com",
     sendLink: "Kirim tautan masuk",

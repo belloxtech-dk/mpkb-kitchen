@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin as adminPlugin, magicLink } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
+import { sql } from "drizzle-orm";
 import { db } from "@/db";
 import { account, session, user, verification } from "@/db/auth-schema";
 import { ac, roles } from "@/lib/auth/permissions";
@@ -21,6 +22,14 @@ export const auth = betterAuth({
       // invite-only: a link only ever signs in an EXISTING (invited) user.
       disableSignUp: true,
       sendMagicLink: async ({ email, url }) => {
+        // Don't email strangers: only send if the address belongs to an invited user.
+        // (The endpoint still returns a generic success, so it doesn't leak who's registered.)
+        const [existing] = await db
+          .select({ id: user.id })
+          .from(user)
+          .where(sql`lower(${user.email}) = ${email.toLowerCase()}`)
+          .limit(1);
+        if (!existing) return;
         await sendMagicLinkEmail(email, url);
       },
     }),
