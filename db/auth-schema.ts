@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 /**
  * Better Auth tables (core + admin plugin fields). Shape matches Better Auth's
@@ -19,6 +19,9 @@ export const user = pgTable("user", {
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires", { withTimezone: true }),
+  // sign-in metrics (updated by a Better Auth session.create hook)
+  lastSignInAt: timestamp("last_sign_in_at", { withTimezone: true }),
+  signInCount: integer("sign_in_count").notNull().default(0),
 });
 
 export const session = pgTable("session", {

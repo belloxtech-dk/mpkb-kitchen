@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin as adminPlugin, magicLink } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { account, session, user, verification } from "@/db/auth-schema";
 import { ac, roles } from "@/lib/auth/permissions";
@@ -31,6 +31,23 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, { provider: "pg", schema: { user, session, account, verification } }),
   emailAndPassword: { enabled: false },
+  databaseHooks: {
+    session: {
+      create: {
+        // Bump the sign-in metrics on every successful sign-in (non-critical: never block auth).
+        after: async (createdSession) => {
+          try {
+            await db
+              .update(user)
+              .set({ lastSignInAt: new Date(), signInCount: sql`${user.signInCount} + 1` })
+              .where(eq(user.id, createdSession.userId));
+          } catch (err) {
+            console.error("[auth] sign-in metric update failed:", err);
+          }
+        },
+      },
+    },
+  },
   plugins: [
     magicLink({
       // invite-only: a link only ever signs in an EXISTING (invited) user.

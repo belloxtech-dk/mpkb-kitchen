@@ -51,6 +51,21 @@ const en = {
     superadminSubtitle: "System-level controls.",
     placeholderNote: "Placeholder — reserved for future controls.",
     roleNames: { user: "User", admin: "Admin", superadmin: "Superadmin" },
+    users: {
+      heading: "Users",
+      name: "Name",
+      email: "Email",
+      role: "Role",
+      status: "Status",
+      invitedOn: "Invited",
+      lastSignIn: "Last sign-in",
+      signIns: "Sign-ins",
+      never: "Never",
+      none: "No users yet.",
+      statusInvited: "Invited",
+      statusActive: "Active",
+      statusBanned: "Banned",
+    },
   },
 
   superadmin: {
@@ -252,6 +267,21 @@ const id: Messages = {
     superadminSubtitle: "Kontrol tingkat sistem.",
     placeholderNote: "Placeholder — disediakan untuk kontrol mendatang.",
     roleNames: { user: "Pengguna", admin: "Admin", superadmin: "Superadmin" },
+    users: {
+      heading: "Pengguna",
+      name: "Nama",
+      email: "Email",
+      role: "Peran",
+      status: "Status",
+      invitedOn: "Diundang",
+      lastSignIn: "Masuk terakhir",
+      signIns: "Jumlah masuk",
+      never: "Belum pernah",
+      none: "Belum ada pengguna.",
+      statusInvited: "Diundang",
+      statusActive: "Aktif",
+      statusBanned: "Diblokir",
+    },
   },
 
   superadmin: {
