@@ -108,7 +108,9 @@ Invite-only, magic-link sign-in. Roles **superadmin / admin / user** (hierarchy:
   admin can invite `user`; superadmin can invite `user`+`admin`. No public sign-up — magic link only signs in
   EXISTING (invited) users.
 - **Bootstrap:** `pnpm seed` upserts jasongalvin@gmail.com as superadmin (idempotent, `db/seed.ts`).
-- Email via Resend if `RESEND_API_KEY` set, else the link is console-logged (`lib/auth/email.ts`).
+- Email via Brevo HTTP API if `BREVO_API_KEY` set, else the link is console-logged (`lib/auth/email.ts`).
+  `EMAIL_FROM` must use a Brevo-authenticated domain; `BETTER_AUTH_URL` builds the link, so in prod it must
+  be `https://dapuramanah.com` (not localhost) or emailed links point to the wrong host.
 - All auth UI is bilingual (dictionary `auth` section). Verified live: magic-link sign-in, role in session,
   invite, invite-only (uninvited email creates nothing), user blocked from /admin + /superadmin (403/redirect).
 

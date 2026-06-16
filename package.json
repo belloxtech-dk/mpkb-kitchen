@@ -22,7 +22,7 @@
     ]
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.104.1",
+    "@anthropic-ai/sdk": "^0.104.2",
     "better-auth": "^1.6.18",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
