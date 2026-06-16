@@ -54,7 +54,7 @@ export function BooksDashboard() {
         {scenario.kitchen} · {scenario.dateIso}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid items-start gap-4 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-3">
           <MealCounts scenario={scenario} />
           <LineItemsTable scenario={scenario} />

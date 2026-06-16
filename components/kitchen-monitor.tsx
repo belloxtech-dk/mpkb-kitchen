@@ -122,7 +122,7 @@ export function KitchenMonitor() {
         </button>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid items-start gap-4 lg:grid-cols-[1.4fr_1fr]">
         {/* CCTV wall */}
         <div className="grid gap-3 sm:grid-cols-2">
           {zones.length === 0 && (
