@@ -16,6 +16,14 @@ export interface AnalysisInput {
 
 export type AnalysisStatus = "idle" | "analyzing" | "done" | "error";
 
+/** The full outcome of one analysis — enough to re-display a zone's inspector later. */
+export interface AnalysisResult {
+  verdict: Verdict;
+  reasoning: string;
+  alert: KitchenAlert | null;
+  ledger: LedgerStamp | null;
+}
+
 export interface AnalysisState {
   status: AnalysisStatus;
   activeZone: string | null;
@@ -41,24 +49,30 @@ export function useAnalysis() {
   const [state, setState] = useState<AnalysisState>(INITIAL);
   const runningRef = useRef(false);
 
-  const run = useCallback(async (input: AnalysisInput): Promise<Verdict | null> => {
+  const run = useCallback(async (input: AnalysisInput): Promise<AnalysisResult | null> => {
     if (runningRef.current) return null;
     runningRef.current = true;
 
     setState({ ...INITIAL, status: "analyzing", activeZone: input.zone });
 
     let finalVerdict: Verdict | null = null;
+    let reasoning = "";
+    let alert: KitchenAlert | null = null;
+    let ledger: LedgerStamp | null = null;
 
     const apply = (event: AnalysisEvent) => {
       switch (event.type) {
         case "reasoning_delta":
+          reasoning += event.text;
           setState((s) => ({ ...s, reasoning: s.reasoning + event.text }));
           break;
         case "verdict":
           finalVerdict = event.verdict;
+          ledger = event.ledger;
           setState((s) => ({ ...s, verdict: event.verdict, ledger: event.ledger }));
           break;
         case "alert":
+          alert = event.alert;
           setState((s) => ({ ...s, alert: event.alert }));
           break;
         case "error":
@@ -105,7 +119,7 @@ export function useAnalysis() {
       runningRef.current = false;
     }
 
-    return finalVerdict;
+    return finalVerdict ? { verdict: finalVerdict, reasoning, alert, ledger } : null;
   }, []);
 
   const reset = useCallback(() => setState(INITIAL), []);
