@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import { Cpu, Sparkles } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { modelShort } from "@/lib/models";
@@ -22,6 +25,15 @@ export function ReasoningStream({
   model?: string;
 }) {
   const empty = text.length === 0;
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Follow the newest text while streaming so the latest narration stays in view.
+  useEffect(() => {
+    if (active && scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [text, active]);
+
   return (
     <div className="rounded-xl border bg-surface p-4">
       <div className="mb-2 flex items-center justify-between gap-2">
@@ -44,15 +56,17 @@ export function ReasoningStream({
           </span>
         )}
       </div>
-      <p
-        className={cn(
-          "font-mono text-[13px] leading-relaxed whitespace-pre-wrap",
-          empty ? "text-muted" : "text-fg",
-          active && "caret",
-        )}
-      >
-        {empty ? (active ? activePlaceholder : idlePlaceholder) : text}
-      </p>
+      <div ref={scrollRef} className="max-h-64 overflow-y-auto pr-1">
+        <p
+          className={cn(
+            "font-mono text-[13px] leading-relaxed whitespace-pre-wrap",
+            empty ? "text-muted" : "text-fg",
+            active && "caret",
+          )}
+        >
+          {empty ? (active ? activePlaceholder : idlePlaceholder) : text}
+        </p>
+      </div>
     </div>
   );
 }
