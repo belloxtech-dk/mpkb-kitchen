@@ -91,7 +91,8 @@ export function ZoneTile({
               className="size-full object-cover brightness-95 contrast-[1.08] grayscale-[0.12]"
             />
             <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_70px_rgba(0,0,0,0.55)]" />
-            <div className="scanline" />
+            {/* sweeping scanline only while genuinely analyzing — keeps the cosmetic honest */}
+            {analyzing && <div className="scanline" />}
 
             {/* label + live/paused/analyzing indicator */}
             <div className="absolute top-2 left-2 flex items-center gap-1.5">
