@@ -1,4 +1,4 @@
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { db } from "./index";
 import { user } from "./auth-schema";
 
@@ -43,4 +43,15 @@ export async function listUsers(): Promise<UserListItem[]> {
     lastSignInAt: r.lastSignInAt ? r.lastSignInAt.getTime() : null,
     signInCount: r.signInCount,
   }));
+}
+
+/** Minimal lookup used to enforce revoke policy (not a superadmin, not yourself). */
+export async function getUserBrief(userId: string): Promise<{ id: string; role: string; banned: boolean } | null> {
+  const [row] = await db
+    .select({ id: user.id, role: user.role, banned: user.banned })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
+  if (!row) return null;
+  return { id: row.id, role: row.role ?? "user", banned: row.banned ?? false };
 }

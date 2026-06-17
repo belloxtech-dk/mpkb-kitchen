@@ -22,7 +22,7 @@ export default async function AdminPage() {
       </div>
       <div className="space-y-6">
         <InviteForm allowedRoles={assignableRoles(session.role)} />
-        <UserList users={users} />
+        <UserList users={users} currentUserId={session.userId} />
       </div>
     </main>
   );

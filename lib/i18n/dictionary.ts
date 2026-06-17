@@ -65,6 +65,12 @@ const en = {
       statusInvited: "Invited",
       statusActive: "Active",
       statusBanned: "Banned",
+      actions: "Actions",
+      revoke: "Revoke",
+      restore: "Restore",
+      revokeConfirm: (email: string) =>
+        `Revoke access for ${email}? They'll be signed out and blocked from signing in.`,
+      you: "You",
     },
   },
 
@@ -288,6 +294,12 @@ const id: Messages = {
       statusInvited: "Diundang",
       statusActive: "Aktif",
       statusBanned: "Diblokir",
+      actions: "Tindakan",
+      revoke: "Cabut akses",
+      restore: "Pulihkan",
+      revokeConfirm: (email: string) =>
+        `Cabut akses untuk ${email}? Mereka akan keluar dan diblokir dari masuk.`,
+      you: "Anda",
     },
   },
 

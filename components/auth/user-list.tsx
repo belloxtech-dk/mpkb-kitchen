@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useLocale, useMessages } from "@/lib/i18n/context";
 import { cn } from "@/lib/cn";
 import type { UserListItem } from "@/db/users";
@@ -18,9 +20,12 @@ const STATUS_CLS: Record<Status, string> = {
   banned: "bg-fail-soft text-fail",
 };
 
-export function UserList({ users }: { users: UserListItem[] }) {
+export function UserList({ users, currentUserId }: { users: UserListItem[]; currentUserId: string }) {
   const m = useMessages();
   const locale = useLocale();
+  const router = useRouter();
+  const [busyId, setBusyId] = useState<string | null>(null);
+
   const dateLocale = locale === "id" ? "id-ID" : "en-US";
   const dateFmt = new Intl.DateTimeFormat(dateLocale, { dateStyle: "medium" });
   const dateTimeFmt = new Intl.DateTimeFormat(dateLocale, { dateStyle: "medium", timeStyle: "short" });
@@ -29,6 +34,18 @@ export function UserList({ users }: { users: UserListItem[] }) {
     invited: m.auth.users.statusInvited,
     active: m.auth.users.statusActive,
     banned: m.auth.users.statusBanned,
+  };
+
+  const act = async (u: UserListItem, action: "revoke" | "restore") => {
+    if (action === "revoke" && !window.confirm(m.auth.users.revokeConfirm(u.email))) return;
+    setBusyId(u.id);
+    const res = await fetch("/api/admin/revoke", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: u.id, action }),
+    });
+    if (res.ok) router.refresh();
+    setBusyId(null);
   };
 
   return (
@@ -47,12 +64,16 @@ export function UserList({ users }: { users: UserListItem[] }) {
                 <th className="pb-2 pr-4 font-medium">{m.auth.users.status}</th>
                 <th className="pb-2 pr-4 font-medium">{m.auth.users.invitedOn}</th>
                 <th className="pb-2 pr-4 font-medium">{m.auth.users.lastSignIn}</th>
-                <th className="pb-2 text-right font-medium">{m.auth.users.signIns}</th>
+                <th className="pb-2 pr-4 text-right font-medium">{m.auth.users.signIns}</th>
+                <th className="pb-2 text-right font-medium">{m.auth.users.actions}</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => {
                 const status = statusOf(u);
+                const isSelf = u.id === currentUserId;
+                const protectedRow = u.role === "superadmin" || isSelf;
+                const rowBusy = busyId === u.id;
                 return (
                   <tr key={u.id} className="border-t">
                     <td className="py-2 pr-4">{u.name}</td>
@@ -67,7 +88,30 @@ export function UserList({ users }: { users: UserListItem[] }) {
                     <td className="py-2 pr-4 text-muted">
                       {u.lastSignInAt ? dateTimeFmt.format(u.lastSignInAt) : m.auth.users.never}
                     </td>
-                    <td className="py-2 text-right tabular-nums">{u.signInCount}</td>
+                    <td className="py-2 pr-4 text-right tabular-nums">{u.signInCount}</td>
+                    <td className="py-2 text-right">
+                      {protectedRow ? (
+                        <span className="text-[10px] text-muted">{isSelf ? m.auth.users.you : "—"}</span>
+                      ) : status === "banned" ? (
+                        <button
+                          type="button"
+                          onClick={() => act(u, "restore")}
+                          disabled={rowBusy}
+                          className="rounded border px-2 py-0.5 text-[11px] text-muted transition hover:text-fg disabled:opacity-40"
+                        >
+                          {m.auth.users.restore}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => act(u, "revoke")}
+                          disabled={rowBusy}
+                          className="rounded border border-fail/40 px-2 py-0.5 text-[11px] text-fail transition hover:bg-fail/10 disabled:opacity-40"
+                        >
+                          {m.auth.users.revoke}
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 );
               })}

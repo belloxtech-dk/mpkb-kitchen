@@ -106,10 +106,13 @@ Invite-only, magic-link sign-in. Roles **superadmin / admin / user** (hierarchy:
   server-side in `app/(authed)/layout.tsx` (redirect to `/landing` if no session). `/admin` (admin+super)
   and `/superadmin` (super only) re-check role in the page. App lives under `app/(authed)/`; public
   `/landing` has the magic-link form.
-- **User list:** `/admin` shows all users (name/email/role/status/invited/last-sign-in/sign-ins), read-only.
-  Status derived from fields: `emailVerified=false` → Invited, `true` → Active, `banned` → Banned. Sign-in
-  metrics (`lastSignInAt`, `signInCount` on `user`) are bumped by a Better Auth `session.create` hook in
-  `lib/auth.ts` (try/catch — never blocks auth). Query in `db/users.ts`.
+- **User list:** `/admin` shows all users (name/email/role/status/invited/last-sign-in/sign-ins). Status
+  derived from fields: `emailVerified=false` → Invited, `true` → Active, `banned` → Banned. Sign-in metrics
+  (`lastSignInAt`, `signInCount` on `user`) are bumped by a Better Auth `session.create` hook in `lib/auth.ts`
+  (try/catch — never blocks auth). Query in `db/users.ts`.
+- **Revoke/restore:** admin/superadmin can revoke (ban) any user **except superadmins or themselves** via
+  `POST /api/admin/revoke`; uses `auth.api.banUser`/`unbanUser` (revokes sessions, blocks sign-in). Revoked
+  users also get no magic-link email (the `sendMagicLink` gate skips `banned`). Reversible (Restore).
 - **Invite:** admin/superadmin only, `POST /api/admin/invite` (`auth.api.createUser` + sends a magic link).
   admin can invite `user`; superadmin can invite `user`+`admin`. No public sign-up — magic link only signs in
   EXISTING (invited) users.

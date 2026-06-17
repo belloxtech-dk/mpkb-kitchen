@@ -53,14 +53,14 @@ export const auth = betterAuth({
       // invite-only: a link only ever signs in an EXISTING (invited) user.
       disableSignUp: true,
       sendMagicLink: async ({ email, url }) => {
-        // Don't email strangers: only send if the address belongs to an invited user.
+        // Don't email strangers or revoked users: only send to an active invited account.
         // (The endpoint still returns a generic success, so it doesn't leak who's registered.)
         const [existing] = await db
-          .select({ id: user.id })
+          .select({ id: user.id, banned: user.banned })
           .from(user)
           .where(sql`lower(${user.email}) = ${email.toLowerCase()}`)
           .limit(1);
-        if (!existing) return;
+        if (!existing || existing.banned) return;
         await sendMagicLinkEmail(email, url);
       },
     }),
