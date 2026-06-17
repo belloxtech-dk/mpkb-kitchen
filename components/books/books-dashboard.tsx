@@ -8,7 +8,7 @@ import { useLocale, useMessages } from "@/lib/i18n/context";
 import { InvoiceList, LineItemsTable, MealCounts, SupplierAwards } from "./scenario-docs";
 import { AuditPanel } from "./audit-panel";
 
-export function BooksDashboard() {
+export function BooksDashboard({ model }: { model: string }) {
   const audit = useAudit();
   const auditing = audit.status === "auditing";
   const m = useMessages();
@@ -63,7 +63,7 @@ export function BooksDashboard() {
             <SupplierAwards scenario={scenario} />
           </div>
         </div>
-        <AuditPanel audit={audit} />
+        <AuditPanel audit={audit} model={model} />
       </div>
     </div>
   );

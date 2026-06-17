@@ -3,24 +3,15 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Cpu, LogOut, Menu, X } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useMessages } from '@/lib/i18n/context';
 import { BrandMark } from './brand-mark';
 import { LocaleToggle } from './locale-toggle';
 import { authClient } from '@/lib/auth-client';
 import { isAdmin, type Role } from '@/lib/auth/roles';
-import { modelShort } from '@/lib/models';
 
-export function SiteHeader({
-  email,
-  role,
-  model,
-}: {
-  email: string;
-  role: Role;
-  model: string;
-}) {
+export function SiteHeader({ email, role }: { email: string; role: Role }) {
   const pathname = usePathname();
   const router = useRouter();
   const m = useMessages();
@@ -78,13 +69,6 @@ export function SiteHeader({
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
-          <span
-            className="hidden items-center gap-1 rounded bg-accent-soft px-1.5 py-0.5 text-[10px] font-semibold text-accent sm:inline-flex"
-            title={model}
-          >
-            <Cpu className="size-3" />
-            {modelShort(model)}
-          </span>
           <LocaleToggle />
           <div className="hidden items-center gap-2 lg:flex">
             <span className="rounded bg-panel px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-muted uppercase">

@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { useMessages } from "@/lib/i18n/context";
 import type { AuditState } from "@/lib/use-audit";
 
-export function AuditPanel({ audit }: { audit: AuditState }) {
+export function AuditPanel({ audit, model }: { audit: AuditState; model: string }) {
   const m = useMessages();
   const { reconciliation, assessment } = audit;
   const auditing = audit.status === "auditing";
@@ -31,6 +31,7 @@ export function AuditPanel({ audit }: { audit: AuditState }) {
         label={m.books.reasoningLabel}
         activePlaceholder={m.books.reasoningActive}
         idlePlaceholder={m.books.reasoningIdle}
+        model={model}
       />
 
       {reconciliation && (

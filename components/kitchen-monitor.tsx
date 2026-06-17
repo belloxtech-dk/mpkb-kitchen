@@ -33,7 +33,7 @@ function formatTimestamp(ms: number): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
 
-export function KitchenMonitor() {
+export function KitchenMonitor({ model }: { model: string }) {
   const [zones, setZones] = useState<ZoneDef[]>([]);
   const [feeds, setFeeds] = useState<Record<string, Feed>>({});
   const [results, setResults] = useState<Record<string, Verdict>>({});
@@ -235,6 +235,7 @@ export function KitchenMonitor() {
             label={m.floor.reasoningLabel}
             activePlaceholder={m.floor.reasoningActive}
             idlePlaceholder={m.floor.reasoningIdle}
+            model={model}
           />
           <VerdictPanel verdict={analysis.verdict} ledger={analysis.ledger} />
           {analysis.alert && <AlertCard alert={analysis.alert} />}
