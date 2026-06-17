@@ -7,6 +7,7 @@ export function ReasoningStream({
   text,
   active,
   label = "AI observation",
+  subject,
   activePlaceholder = "Analyzing frame…",
   idlePlaceholder = "Awaiting a frame to inspect.",
   model,
@@ -14,6 +15,8 @@ export function ReasoningStream({
   text: string;
   active: boolean;
   label?: string;
+  /** Optional subject the narration pertains to (e.g. a zone), shown as a chip beside the label. */
+  subject?: string;
   activePlaceholder?: string;
   idlePlaceholder?: string;
   model?: string;
@@ -22,9 +25,14 @@ export function ReasoningStream({
   return (
     <div className="rounded-xl border bg-surface p-4">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted uppercase">
-          <Sparkles className={cn("size-3.5", active ? "text-accent" : "text-muted")} />
-          {label}
+        <div className="flex min-w-0 items-center gap-1.5 text-xs font-medium tracking-wide text-muted uppercase">
+          <Sparkles className={cn("size-3.5 shrink-0", active ? "text-accent" : "text-muted")} />
+          <span className="shrink-0">{label}</span>
+          {subject && (
+            <span className="truncate rounded bg-panel px-1.5 py-0.5 text-[10px] font-semibold text-fg normal-case">
+              {subject}
+            </span>
+          )}
         </div>
         {model && (
           <span

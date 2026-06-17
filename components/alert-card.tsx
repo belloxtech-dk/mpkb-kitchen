@@ -13,7 +13,7 @@ export function AlertCard({ alert }: { alert: KitchenAlert }) {
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-fail uppercase">
           <Smartphone className="size-3.5" />
-          {m.alert.sent}
+          {alert.delivered ? m.alert.sent : m.alert.wouldSend}
         </div>
         <span className={cn("rounded px-1.5 py-0.5 text-[10px] font-semibold", sev.bg, sev.text)}>
           {m.severity[alert.severity]}

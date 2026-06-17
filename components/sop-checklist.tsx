@@ -5,7 +5,7 @@ import { useLocale, useMessages } from "@/lib/i18n/context";
 import type { Verdict } from "@/schemas/verdict";
 
 /** The fixed SOP rule list, annotated with the model's per-rule results. */
-export function SopChecklist({ verdict }: { verdict: Verdict | null }) {
+export function SopChecklist({ verdict, pending = false }: { verdict: Verdict | null; pending?: boolean }) {
   const m = useMessages();
   const locale = useLocale();
   const byId = new Map(verdict?.checks.map((c) => [c.id, c]) ?? []);
@@ -31,6 +31,8 @@ export function SopChecklist({ verdict }: { verdict: Verdict | null }) {
               >
                 {m.status[check.status]}
               </span>
+            ) : pending ? (
+              <span className="h-4 w-12 shrink-0 animate-pulse rounded bg-panel" />
             ) : (
               <span className="shrink-0 text-[10px] text-muted">—</span>
             )}

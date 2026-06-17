@@ -180,9 +180,24 @@ export function KitchenMonitor({ model }: { model: string }) {
       {/* summary bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-surface px-4 py-3">
         <div className="flex items-center gap-5">
-          <Stat label={m.floor.kitchenScore} value={avgScore === null ? "—" : String(avgScore)} valueClass={avgScore === null ? "text-muted" : scoreColor(avgScore)} />
-          <Stat label={m.floor.zonesFlagged} value={String(flagged)} valueClass={flagged > 0 ? "text-fail" : "text-pass"} />
-          <Stat label={m.floor.analyzed} value={`${scored.length}/${zones.length || "—"}`} valueClass="text-fg" />
+          <Stat
+            label={m.floor.kitchenScore}
+            value={avgScore === null ? "—" : String(avgScore)}
+            suffix={avgScore === null ? undefined : "/ 100"}
+            valueClass={avgScore === null ? "text-muted" : scoreColor(avgScore)}
+          />
+          <Stat
+            label={m.floor.zonesFlagged}
+            value={String(flagged)}
+            suffix={zones.length ? `/ ${zones.length}` : undefined}
+            valueClass={flagged > 0 ? "text-fail" : "text-pass"}
+          />
+          <Stat
+            label={m.floor.analyzed}
+            value={String(scored.length)}
+            suffix={zones.length ? `/ ${zones.length}` : undefined}
+            valueClass="text-fg"
+          />
         </div>
         <button
           type="button"
@@ -233,11 +248,12 @@ export function KitchenMonitor({ model }: { model: string }) {
             text={analysis.reasoning}
             active={busy}
             label={m.floor.reasoningLabel}
+            subject={analysis.activeZone ?? undefined}
             activePlaceholder={m.floor.reasoningActive}
             idlePlaceholder={m.floor.reasoningIdle}
             model={model}
           />
-          <VerdictPanel verdict={analysis.verdict} ledger={analysis.ledger} />
+          <VerdictPanel verdict={analysis.verdict} ledger={analysis.ledger} analyzing={busy} />
           {analysis.alert && <AlertCard alert={analysis.alert} />}
           {analysis.error && (
             <div className="rounded-xl border border-fail/30 bg-fail-soft p-3 text-sm text-fail">{analysis.error}</div>
@@ -248,10 +264,23 @@ export function KitchenMonitor({ model }: { model: string }) {
   );
 }
 
-function Stat({ label, value, valueClass }: { label: string; value: string; valueClass?: string }) {
+function Stat({
+  label,
+  value,
+  suffix,
+  valueClass,
+}: {
+  label: string;
+  value: string;
+  suffix?: string;
+  valueClass?: string;
+}) {
   return (
     <div>
-      <div className={cn("font-mono text-xl font-semibold tabular-nums", valueClass)}>{value}</div>
+      <div className="font-mono text-xl font-semibold tabular-nums">
+        <span className={valueClass}>{value}</span>
+        {suffix && <span className="ml-0.5 text-sm font-normal text-muted">{suffix}</span>}
+      </div>
       <div className="text-[10px] tracking-wide text-muted uppercase">{label}</div>
     </div>
   );

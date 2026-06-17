@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react";
 import { SopChecklist } from "./sop-checklist";
 import { getSopRule } from "@/lib/sop";
 import { SEVERITY_STYLE, scoreColor, STATUS_STYLE } from "@/lib/status-styles";
@@ -6,28 +7,43 @@ import { useLocale, useMessages } from "@/lib/i18n/context";
 import type { LedgerStamp } from "@/lib/events";
 import type { Verdict } from "@/schemas/verdict";
 
-export function VerdictPanel({ verdict, ledger }: { verdict: Verdict | null; ledger: LedgerStamp | null }) {
+export function VerdictPanel({
+  verdict,
+  ledger,
+  analyzing = false,
+}: {
+  verdict: Verdict | null;
+  ledger: LedgerStamp | null;
+  analyzing?: boolean;
+}) {
   const m = useMessages();
   const locale = useLocale();
+  // The verdict event arrives last (after the reasoning stream), so show a working
+  // state here meanwhile — keeps eyes on the checklist while the model is judging.
+  const pending = analyzing && !verdict;
 
   return (
     <div className="rounded-xl border bg-surface p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-xs font-medium tracking-wide text-muted uppercase">{m.verdict.title}</div>
-          <p className="mt-1 text-[13px] text-fg">{verdict?.summary ?? m.verdict.empty}</p>
+          <p className={cn("mt-1 text-[13px]", pending ? "animate-pulse text-muted" : "text-fg")}>
+            {verdict?.summary ?? (pending ? m.verdict.analyzing : m.verdict.empty)}
+          </p>
         </div>
-        {verdict && (
+        {verdict ? (
           <div className="shrink-0 text-right">
             <div className={cn("font-mono text-2xl font-semibold tabular-nums", scoreColor(verdict.complianceScore))}>
               {Math.round(verdict.complianceScore)}
             </div>
             <div className="text-[10px] tracking-wide text-muted uppercase">{m.verdict.score}</div>
           </div>
-        )}
+        ) : pending ? (
+          <Loader2 className="size-5 shrink-0 animate-spin text-accent" />
+        ) : null}
       </div>
 
-      <SopChecklist verdict={verdict} />
+      <SopChecklist verdict={verdict} pending={pending} />
 
       {verdict && verdict.violations.length > 0 && (
         <div className="mt-3 space-y-1.5">

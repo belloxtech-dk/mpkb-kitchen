@@ -133,14 +133,16 @@ const en = {
   verdict: {
     title: "SOP verdict",
     empty: "No frame analyzed yet.",
+    analyzing: "Evaluating SOP compliance…",
     score: "score",
     violations: "Violations",
   },
 
   alert: {
     sent: "Phone alert sent",
+    wouldSend: "Phone alert would be sent",
     delivered: "Delivered via Telegram ✓",
-    notConfigured: "Telegram not configured — shown in-app only",
+    notConfigured: "Telegram not configured — alert shown in-app only",
     bodyTpl: (zone: string, label: string, detail: string, action: string) =>
       `⚠️ ${zone}: ${label} issue. ${detail} Action: ${action}`,
   },
@@ -363,14 +365,16 @@ const id: Messages = {
   verdict: {
     title: "Putusan SOP",
     empty: "Belum ada frame dianalisis.",
+    analyzing: "Mengevaluasi kepatuhan SOP…",
     score: "skor",
     violations: "Pelanggaran",
   },
 
   alert: {
     sent: "Peringatan terkirim ke ponsel",
+    wouldSend: "Peringatan ponsel akan dikirim",
     delivered: "Terkirim via Telegram ✓",
-    notConfigured: "Telegram belum dikonfigurasi — hanya tampil di aplikasi",
+    notConfigured: "Telegram belum dikonfigurasi — peringatan hanya tampil di aplikasi",
     bodyTpl: (zone: string, label: string, detail: string, action: string) =>
       `⚠️ ${zone}: ${label} bermasalah. ${detail} Tindakan: ${action}`,
   },
