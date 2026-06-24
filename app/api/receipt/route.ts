@@ -7,6 +7,7 @@ import { getModel } from "@/lib/anthropic";
 import { getAppSession } from "@/lib/auth/session";
 import { scanReceipt } from "@/lib/receipt/scanner";
 import { crossCheck } from "@/lib/receipt/checker";
+import { buildReceiptReport, dispatchReport } from "@/lib/notify/report";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -59,6 +60,9 @@ export async function POST(req: Request): Promise<Response> {
       summary:        check.summary,
       imageHash,
     });
+
+    // Bilingual report → broadcast to configured WA recipients (non-blocking)
+    dispatchReport(buildReceiptReport({ scanId: id, kitchen, extraction, check, source: "web" }));
 
     return Response.json({
       id,

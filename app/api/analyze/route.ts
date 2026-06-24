@@ -4,6 +4,7 @@ import { createVisionStream, deriveAlert, extractVerdict } from "@/lib/vision";
 import { sendTelegramAlert } from "@/lib/telegram";
 import { recordSopEvent } from "@/db/repo";
 import { getModel } from "@/lib/anthropic";
+import { buildSopReport, dispatchReport } from "@/lib/notify/report";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,6 +40,16 @@ export async function POST(req: Request): Promise<Response> {
 
         const { event, stamp } = await recordSopEvent({ zone, source, verdict });
         send({ type: "verdict", eventId: event.id, verdict, ledger: stamp });
+
+        // Bilingual report → broadcast to configured WA recipients (non-blocking)
+        dispatchReport(buildSopReport({
+          eventId: event.id,
+          zone,
+          score: verdict.complianceScore,
+          status: verdict.overallStatus,
+          summary: verdict.summary,
+          violations: verdict.violations.map((v) => ({ ruleId: v.ruleId, severity: v.severity, detail: v.detail })),
+        }));
 
         const alert = deriveAlert(zone, verdict, locale);
         if (alert) {

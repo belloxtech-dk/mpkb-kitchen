@@ -25,6 +25,7 @@ import { scanReceipt } from "@/lib/receipt/scanner";
 import { crossCheck } from "@/lib/receipt/checker";
 import { getModel } from "@/lib/anthropic";
 import { FLEET_KITCHENS } from "@/lib/fleet/kitchens";
+import { buildReceiptReport, dispatchReport } from "@/lib/notify/report";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -333,7 +334,7 @@ export async function POST(req: Request): Promise<Response> {
       await db.insert(priceIntelligence).values(priceRows);
     }
 
-    // Reply with results
+    // Reply to the sender with results
     const reply = buildReplyText(
       extraction.supplierName,
       check.totalIdr,
@@ -344,6 +345,9 @@ export async function POST(req: Request): Promise<Response> {
       id,
     );
     await sendWaReply(from, reply, provider);
+
+    // Also broadcast the full bilingual report to oversight recipients (non-blocking)
+    dispatchReport(buildReceiptReport({ scanId: id, kitchen, extraction, check, source: "whatsapp" }));
 
     return Response.json({ ok: true, scanId: id, risk: check.riskLevel });
   } catch (err) {
