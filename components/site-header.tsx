@@ -3,10 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LogOut, Menu, X, LayoutDashboard, Camera, BookOpen, Shield, Users, Bell, FileText, Receipt } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, Camera, BookOpen, Shield, Users, Bell, FileText, Receipt, Building2 } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useMessages } from '@/lib/i18n/context';
-import { LocaleToggle } from './locale-toggle';
 import { authClient } from '@/lib/auth-client';
 import { isAdmin, type Role } from '@/lib/auth/roles';
 
@@ -19,15 +18,18 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   const tabs = [
-    { href: '/',        label: 'Home',      icon: LayoutDashboard },
-    { href: '/floor',   label: 'CCTV',      icon: Camera },
-    { href: '/books',   label: 'Keuangan',  icon: BookOpen },
+    { href: '/',        label: 'Beranda',    icon: LayoutDashboard },
+    { href: '/floor',   label: 'CCTV',       icon: Camera },
     { href: '/receipts',label: 'Struk',      icon: Receipt },
+    { href: '/books',   label: 'Keuangan',   icon: BookOpen },
     { href: '/alerts',  label: 'Peringatan', icon: Bell },
     { href: '/reports', label: 'Laporan',    icon: FileText },
     { href: '/ledger',  label: 'Ledger',     icon: Shield },
   ];
-  if (isAdmin(role)) tabs.push({ href: '/admin', label: 'Admin', icon: Users });
+  if (isAdmin(role)) {
+    tabs.push({ href: '/kitchens', label: 'Pengawasan', icon: Building2 });
+    tabs.push({ href: '/admin',    label: 'Admin',      icon: Users });
+  }
 
   const handleSignOut = async () => {
     setMenuOpen(false);
@@ -74,8 +76,6 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2 ml-auto">
-          <LocaleToggle />
-
           {/* User pill */}
           <div className="hidden items-center gap-2 lg:flex">
             <div className="flex items-center gap-1.5 rounded-lg border border-border bg-panel px-2 py-1">

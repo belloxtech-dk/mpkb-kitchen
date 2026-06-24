@@ -1,6 +1,5 @@
 import { getServerMessages } from '@/lib/i18n/server';
 import { LoginForm } from '@/components/auth/login-form';
-import { LocaleToggle } from '@/components/locale-toggle';
 
 export default async function LandingPage() {
   const m = await getServerMessages();
@@ -33,7 +32,6 @@ export default async function LandingPage() {
             <div className="text-[10px] text-muted leading-tight">Kitchen Integrity</div>
           </div>
         </div>
-        <LocaleToggle />
       </header>
 
       <section className="relative flex flex-1 items-center justify-center px-4 py-10 sm:px-6">

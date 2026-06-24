@@ -60,9 +60,35 @@ export const receiptScans = pgTable("receipt_scans", {
   checks:         jsonb("checks").notNull().default([]),
   summary:        text("summary").notNull().default(""),
   imageHash:      text("image_hash"),
+  waPhone:        text("wa_phone"),
+  source:         text("source").notNull().default("web"),
 });
 
 export type ReceiptScanRow = typeof receiptScans.$inferSelect;
+
+/** WA bot session state per phone number */
+export const waSessions = pgTable("wa_sessions", {
+  id:        text("id").primaryKey(),
+  waPhone:   text("wa_phone").notNull().unique(),
+  kitchenId: text("kitchen_id"),
+  userId:    text("user_id"),
+  state:     text("state").notNull().default("idle"),
+  lastSeen:  timestamp("last_seen", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Real market prices collected from submitted receipts */
+export const priceIntelligence = pgTable("price_intelligence", {
+  id:        text("id").primaryKey(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  kitchenId: text("kitchen_id").notNull(),
+  itemName:  text("item_name").notNull(),
+  unit:      text("unit").notNull(),
+  priceIdr:  doublePrecision("price_idr").notNull(),
+  supplier:  text("supplier"),
+  receiptId: text("receipt_id"),
+  source:    text("source").default("receipt"),
+});
 
 /** Simple key/value app settings (e.g. the active Claude model). */
 export const appSettings = pgTable("app_settings", {
