@@ -30,7 +30,8 @@ export async function POST(req: Request): Promise<Response> {
         send({ type: "status", state: "started", zone, source });
 
         const model = await getModel();
-        const vision = createVisionStream({ imageBase64, mediaType, zone, locale, model });
+        // createVisionStream is now async — it builds rich domain context before calling Claude
+        const vision = await createVisionStream({ imageBase64, mediaType, zone, locale, model });
         vision.on("text", (delta: string) => send({ type: "reasoning_delta", text: delta }));
 
         const final = await vision.finalMessage();
