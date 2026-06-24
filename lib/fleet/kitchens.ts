@@ -24,6 +24,30 @@ export const FLEET_KITCHENS: FleetKitchen[] = [
     pilot: true,
   },
   {
+    id: 'gamping-02',
+    label: 'SPPG Gamping 02 · Yogyakarta',
+    province: 'DI Yogyakarta',
+    status: 'locked',
+  },
+  {
+    id: 'gamping-03',
+    label: 'SPPG Gamping 03 · Yogyakarta',
+    province: 'DI Yogyakarta',
+    status: 'locked',
+  },
+  {
+    id: 'gamping-04',
+    label: 'SPPG Gamping 04 · Yogyakarta',
+    province: 'DI Yogyakarta',
+    status: 'locked',
+  },
+  {
+    id: 'gamping-05',
+    label: 'SPPG Gamping 05 · Yogyakarta',
+    province: 'DI Yogyakarta',
+    status: 'locked',
+  },
+  {
     id: 'bandung-04',
     label: 'SPPG 04 — Bandung',
     province: 'Jawa Barat',
@@ -119,6 +143,7 @@ export const FLEET_STATS = {
   registered: 277,
   provinces: 38,
   live: 1,
+  pilotKitchens: 5,
 };
 
 export function pilotKitchen(): FleetKitchen {

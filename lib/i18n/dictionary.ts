@@ -19,7 +19,7 @@ const en = {
     notActive: "Not yet active",
     noResults: "No kitchens match.",
     lockedNote:
-      "Only the pilot kitchen (Lombok) is available for live monitoring in this preview. Other kitchens are enrolled in the programme but not yet provisioned.",
+      "Only the pilot kitchen (SPPG Gamping, Yogyakarta) is available for live monitoring in this preview. Other kitchens are enrolled in the programme but not yet provisioned.",
   },
 
   auth: {
@@ -250,7 +250,7 @@ const id: Messages = {
     notActive: "Belum aktif",
     noResults: "Tidak ada dapur yang cocok.",
     lockedNote:
-      "Hanya dapur percontohan (Lombok) yang tersedia untuk pemantauan langsung pada pratinjau ini. Dapur lain terdaftar dalam program tetapi belum diaktifkan.",
+      "Hanya dapur percontohan (SPPG Gamping, Yogyakarta) yang tersedia untuk pemantauan langsung pada pratinjau ini. Dapur lain terdaftar dalam program tetapi belum diaktifkan.",
   },
 
   auth: {

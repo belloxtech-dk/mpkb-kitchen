@@ -12,7 +12,9 @@ export default async function AuthedLayout({ children }: { children: React.React
     <>
       <SiteHeader email={session.email} role={session.role} />
       <FleetBar />
-      {children}
+      <div className="fade-up">
+        {children}
+      </div>
     </>
   );
 }

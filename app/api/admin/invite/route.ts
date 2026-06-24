@@ -12,6 +12,7 @@ const BodySchema = z.object({
   email: z.string().email(),
   name: z.string().min(1),
   role: z.enum(["user", "admin", "superadmin"]),
+  password: z.string().min(6).optional(),
 });
 
 export async function POST(req: Request): Promise<Response> {
@@ -24,30 +25,25 @@ export async function POST(req: Request): Promise<Response> {
   if (!parsed.success) {
     return Response.json({ error: "invalid request" }, { status: 422 });
   }
-  const { email, name, role } = parsed.data;
+  const { email, name, role, password } = parsed.data;
 
   // Enforce privilege boundary: admin can invite users; superadmin can invite users + admins.
   if (!assignableRoles(session.role).includes(role)) {
     return Response.json({ error: "role not allowed" }, { status: 403 });
   }
 
+  // Use supplied password or fall back to "mbg123" default.
+  const finalPassword = password ?? "mbg123";
+
   const h = await headers();
   try {
-    // Magic-link users never use this password; it satisfies createUser's requirement.
     await auth.api.createUser({
-      body: { email, name, password: randomUUID(), role },
+      body: { email, name, password: finalPassword, role },
       headers: h,
     });
   } catch (err) {
     return Response.json({ error: err instanceof Error ? err.message : "createUser failed" }, { status: 400 });
   }
 
-  // Best-effort: email the invitee a sign-in link now.
-  try {
-    await auth.api.signInMagicLink({ body: { email, callbackURL: "/" }, headers: h });
-  } catch {
-    /* user is created; they can also request a link themselves at /landing */
-  }
-
-  return Response.json({ ok: true });
+  return Response.json({ ok: true, defaultPassword: finalPassword });
 }

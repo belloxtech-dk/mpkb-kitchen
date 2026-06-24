@@ -17,3 +17,10 @@ export async function getAppSession(): Promise<AppSession | null> {
   const u = result.user as { id: string; email: string; name: string; role?: string | null };
   return { userId: u.id, email: u.email, name: u.name, role: asRole(u.role) };
 }
+
+/** Throws a 401 response if not authenticated — use in API route handlers. */
+export async function requireAuth(): Promise<AppSession> {
+  const session = await getAppSession();
+  if (!session) throw new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+  return session;
+}
