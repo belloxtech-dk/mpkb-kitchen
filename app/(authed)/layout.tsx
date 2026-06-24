@@ -13,7 +13,7 @@ export default async function AuthedLayout({ children }: { children: React.React
     <>
       <SiteHeader email={session.email} role={session.role} />
       <FleetBar />
-      <div className="fade-up pb-16 sm:pb-0">
+      <div className="fade-up pb-20 sm:pb-0" style={{ paddingBottom: 'max(5rem, calc(4rem + env(safe-area-inset-bottom)))' }}>
         {children}
       </div>
       <MobileNav />

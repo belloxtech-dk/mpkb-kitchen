@@ -213,7 +213,7 @@ export default async function ReportsPage() {
                 <div>
                   <p className="text-xs text-muted mb-2">Tren Skor Kepatuhan ({trendPoints.length} inspeksi, terlama → terbaru)</p>
                   <div className="flex items-end gap-1 h-16 px-1 rounded-lg bg-panel/50 py-2">
-                    {trendPoints.map((p, i) => (
+                    {trendPoints.map((p) => (
                       <TrendBar key={p.id} score={p.complianceScore} status={p.overallStatus} />
                     ))}
                   </div>

@@ -5,7 +5,7 @@ import { desc, sql } from "drizzle-orm";
 import { getServerMessages } from "@/lib/i18n/server";
 import { getAppSession } from "@/lib/auth/session";
 import { FLEET_STATS } from "@/lib/fleet/kitchens";
-import { ApiKeyBanner } from "@/components/api-key-banner";
+import { DemoModeBanner } from "@/components/demo-mode-banner";
 import { ComplianceTrend } from "@/components/compliance-trend";
 import { cn } from "@/lib/cn";
 
@@ -85,7 +85,7 @@ export default async function DashboardPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
       {/* API key warning */}
-      {apiKeyMissing && <ApiKeyBanner />}
+      {apiKeyMissing && <DemoModeBanner />}
 
       {/* Greeting */}
       <div>
@@ -240,21 +240,26 @@ export default async function DashboardPage() {
       </div>
 
       {/* System status strip */}
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border/50 bg-surface/60 px-4 py-2.5">
         <div className="flex items-center gap-2 text-xs">
           <span className="relative flex size-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-pass opacity-60" />
             <span className="relative inline-flex size-2 rounded-full bg-pass" />
           </span>
-          <span className="text-pass font-medium">Sistem Online</span>
+          <span className="text-pass font-semibold">Online</span>
         </div>
-        <div className="h-3 w-px bg-border" />
-        <div className="text-xs text-muted">SPPG Gamping, Yogyakarta</div>
-        <div className="h-3 w-px bg-border" />
-        <div className="text-xs text-muted">5 dapur terdaftar · 1 aktif</div>
-        <div className="ml-auto text-xs text-muted hidden sm:block">
-          🔗 <a href="https://mpkb-kitchen-production.up.railway.app" target="_blank" className="text-accent hover:underline">mpkb-kitchen-production.up.railway.app</a>
-        </div>
+        <span className="text-border">·</span>
+        <span className="text-xs text-muted">SPPG Gamping, Yogyakarta</span>
+        <span className="text-border hidden sm:inline">·</span>
+        <span className="text-xs text-muted hidden sm:inline">5 dapur pilot</span>
+        <a
+          href="https://mpkb-kitchen-production.up.railway.app"
+          target="_blank"
+          rel="noopener"
+          className="ml-auto hidden text-[11px] text-accent hover:underline sm:inline"
+        >
+          🌐 Live
+        </a>
       </div>
 
       {/* Quick actions */}
@@ -264,6 +269,23 @@ export default async function DashboardPage() {
         <QuickAction href="/alerts"  emoji="🔔" label="Peringatan"     sub="Riwayat pelanggaran" />
         <QuickAction href="/reports" emoji="📋" label="Laporan"        sub="Ekspor & cetak" />
         <QuickAction href="/ledger"  emoji="🔐" label="Buku Besar"     sub="Jejak audit" />
+      </div>
+
+      {/* Budget tracker */}
+      <div className="rounded-xl border border-border/50 bg-surface/60 px-4 py-3 flex items-center gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-semibold text-fg">Budget AI Bulan Ini</span>
+            <span className="text-xs text-muted">$189.50 tersedia</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-panel overflow-hidden">
+            <div className="h-full rounded-full bg-pass" style={{ width: '5%' }} />
+          </div>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-[10px] text-muted">claude-sonnet-4-6</span>
+            <span className="text-[10px] text-pass font-medium">~5% terpakai</span>
+          </div>
+        </div>
       </div>
     </main>
   );

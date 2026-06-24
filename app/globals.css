@@ -30,15 +30,24 @@
 }
 
 @layer base {
-  html { color-scheme: dark; }
+  html {
+    color-scheme: dark;
+    /* Ensure safe-area-inset values are available */
+    height: 100%;
+  }
   body {
     background-color: var(--color-bg);
     color: var(--color-fg);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    min-height: 100dvh;
   }
   * { border-color: var(--color-border); }
+
+  /* Hide scrollbars visually but keep functionality */
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
 }
 
 /* ── CCTV scan line ──────────────────────────────────── */

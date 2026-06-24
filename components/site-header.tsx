@@ -19,14 +19,14 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   const tabs = [
-    { href: '/',       label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/floor',  label: m.nav.floor,  icon: Camera },
-    { href: '/books',  label: m.nav.books,  icon: BookOpen },
-    { href: '/ledger',  label: m.nav.ledger,  icon: Shield },
-    { href: '/alerts',  label: 'Peringatan', icon: Bell },
-    { href: '/reports', label: 'Laporan',    icon: FileText },
+    { href: '/',        label: 'Home',      icon: LayoutDashboard },
+    { href: '/floor',   label: 'CCTV',      icon: Camera },
+    { href: '/books',   label: 'Keuangan',  icon: BookOpen },
+    { href: '/alerts',  label: 'Peringatan',icon: Bell },
+    { href: '/reports', label: 'Laporan',   icon: FileText },
+    { href: '/ledger',  label: 'Ledger',    icon: Shield },
   ];
-  if (isAdmin(role)) tabs.push({ href: '/admin', label: m.auth.navAdmin, icon: Users });
+  if (isAdmin(role)) tabs.push({ href: '/admin', label: 'Admin', icon: Users });
 
   const handleSignOut = async () => {
     setMenuOpen(false);
@@ -50,7 +50,7 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
         </Link>
 
         {/* Nav tabs */}
-        <nav className="hidden min-w-0 items-center gap-0.5 sm:flex flex-1">
+        <nav className="hidden sm:flex flex-1 min-w-0 overflow-x-auto items-center gap-0.5 scrollbar-none">
           {tabs.map((tab) => {
             const active = pathname === tab.href;
             const Icon = tab.icon;

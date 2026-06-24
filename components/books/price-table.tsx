@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { formatIdr } from "@/lib/format";
@@ -154,9 +154,9 @@ export function PriceTable({ actualPrices = {} }: PriceTableProps) {
               {visibleCategories.map((cat) => {
                 const catRows = grouped.get(cat)!;
                 return (
-                  <>
+                  <React.Fragment key={cat}>
                     {/* Category header row */}
-                    <tr key={`cat-${cat}`} className="border-b bg-surface/60">
+                    <tr className="border-b bg-surface/60">
                       <td
                         colSpan={Object.keys(actualPrices).length > 0 ? 7 : 5}
                         className="px-3 py-1.5"
@@ -217,7 +217,7 @@ export function PriceTable({ actualPrices = {} }: PriceTableProps) {
                         </tr>
                       );
                     })}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </tbody>
