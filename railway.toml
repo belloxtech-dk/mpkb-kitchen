@@ -3,7 +3,7 @@ builder = "nixpacks"
 
 [deploy]
 startCommand = "node_modules/.bin/next start -p $PORT"
-healthcheckPath = "/landing"
+healthcheckPath = "/api/health"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3

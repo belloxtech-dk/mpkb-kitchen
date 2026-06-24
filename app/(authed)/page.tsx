@@ -239,11 +239,31 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {/* System status strip */}
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+        <div className="flex items-center gap-2 text-xs">
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-pass opacity-60" />
+            <span className="relative inline-flex size-2 rounded-full bg-pass" />
+          </span>
+          <span className="text-pass font-medium">Sistem Online</span>
+        </div>
+        <div className="h-3 w-px bg-border" />
+        <div className="text-xs text-muted">SPPG Gamping, Yogyakarta</div>
+        <div className="h-3 w-px bg-border" />
+        <div className="text-xs text-muted">5 dapur terdaftar · 1 aktif</div>
+        <div className="ml-auto text-xs text-muted hidden sm:block">
+          🔗 <a href="https://mpkb-kitchen-production.up.railway.app" target="_blank" className="text-accent hover:underline">mpkb-kitchen-production.up.railway.app</a>
+        </div>
+      </div>
+
       {/* Quick actions */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <QuickAction href="/floor" emoji="📷" label="Inspeksi Dapur" sub="Analisis frame CCTV" />
-        <QuickAction href="/books" emoji="📒" label="Audit Keuangan" sub="Periksa pembukuan" />
-        <QuickAction href="/ledger" emoji="🔐" label="Buku Besar" sub="Lihat jejak audit" />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <QuickAction href="/floor"   emoji="📷" label="Inspeksi CCTV"  sub="Analisis frame dapur" />
+        <QuickAction href="/books"   emoji="📒" label="Audit Keuangan" sub="Periksa pembukuan" />
+        <QuickAction href="/alerts"  emoji="🔔" label="Peringatan"     sub="Riwayat pelanggaran" />
+        <QuickAction href="/reports" emoji="📋" label="Laporan"        sub="Ekspor & cetak" />
+        <QuickAction href="/ledger"  emoji="🔐" label="Buku Besar"     sub="Jejak audit" />
       </div>
     </main>
   );

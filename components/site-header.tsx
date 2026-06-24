@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LogOut, Menu, X, LayoutDashboard, Camera, BookOpen, Shield, Users } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, Camera, BookOpen, Shield, Users, Bell, FileText } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useMessages } from '@/lib/i18n/context';
 import { LocaleToggle } from './locale-toggle';
@@ -22,7 +22,9 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
     { href: '/',       label: 'Dashboard', icon: LayoutDashboard },
     { href: '/floor',  label: m.nav.floor,  icon: Camera },
     { href: '/books',  label: m.nav.books,  icon: BookOpen },
-    { href: '/ledger', label: m.nav.ledger, icon: Shield },
+    { href: '/ledger',  label: m.nav.ledger,  icon: Shield },
+    { href: '/alerts',  label: 'Peringatan', icon: Bell },
+    { href: '/reports', label: 'Laporan',    icon: FileText },
   ];
   if (isAdmin(role)) tabs.push({ href: '/admin', label: m.auth.navAdmin, icon: Users });
 
