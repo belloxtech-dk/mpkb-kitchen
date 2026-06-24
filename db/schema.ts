@@ -43,6 +43,27 @@ export const ledger = pgTable("ledger", {
   hash: text("hash").notNull(),
 });
 
+/** Receipt scan + price verification results. */
+export const receiptScans = pgTable("receipt_scans", {
+  id:             text("id").primaryKey(),
+  createdAt:      timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  kitchen:        text("kitchen").notNull(),
+  supplier:       text("supplier"),
+  receiptDate:    text("receipt_date"),
+  receiptNumber:  text("receipt_number"),
+  totalIdr:       doublePrecision("total_idr").notNull().default(0),
+  overpaymentIdr: doublePrecision("overpayment_idr").notNull().default(0),
+  riskLevel:      text("risk_level").notNull().default("low"),
+  itemCount:      serial("item_count").notNull(),
+  flaggedCount:   serial("flagged_count").notNull(),
+  items:          jsonb("items").notNull().default([]),
+  checks:         jsonb("checks").notNull().default([]),
+  summary:        text("summary").notNull().default(""),
+  imageHash:      text("image_hash"),
+});
+
+export type ReceiptScanRow = typeof receiptScans.$inferSelect;
+
 /** Simple key/value app settings (e.g. the active Claude model). */
 export const appSettings = pgTable("app_settings", {
   key: text("key").primaryKey(),

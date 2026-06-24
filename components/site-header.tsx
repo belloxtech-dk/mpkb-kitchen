@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LogOut, Menu, X, LayoutDashboard, Camera, BookOpen, Shield, Users, Bell, FileText } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, Camera, BookOpen, Shield, Users, Bell, FileText, Receipt } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useMessages } from '@/lib/i18n/context';
 import { LocaleToggle } from './locale-toggle';
@@ -22,9 +22,10 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
     { href: '/',        label: 'Home',      icon: LayoutDashboard },
     { href: '/floor',   label: 'CCTV',      icon: Camera },
     { href: '/books',   label: 'Keuangan',  icon: BookOpen },
-    { href: '/alerts',  label: 'Peringatan',icon: Bell },
-    { href: '/reports', label: 'Laporan',   icon: FileText },
-    { href: '/ledger',  label: 'Ledger',    icon: Shield },
+    { href: '/receipts',label: 'Struk',      icon: Receipt },
+    { href: '/alerts',  label: 'Peringatan', icon: Bell },
+    { href: '/reports', label: 'Laporan',    icon: FileText },
+    { href: '/ledger',  label: 'Ledger',     icon: Shield },
   ];
   if (isAdmin(role)) tabs.push({ href: '/admin', label: 'Admin', icon: Users });
 

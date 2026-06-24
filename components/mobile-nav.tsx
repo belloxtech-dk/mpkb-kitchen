@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Camera, BookOpen, Shield, Bell } from "lucide-react";
+import { LayoutDashboard, Camera, Receipt, Bell, Shield } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const TABS = [
-  { href: "/",       label: "Home",     icon: LayoutDashboard },
-  { href: "/floor",  label: "CCTV",     icon: Camera },
-  { href: "/books",  label: "Keuangan", icon: BookOpen },
-  { href: "/alerts", label: "Alert",    icon: Bell },
-  { href: "/ledger", label: "Ledger",   icon: Shield },
+  { href: "/",         label: "Home",   icon: LayoutDashboard },
+  { href: "/floor",    label: "CCTV",   icon: Camera },
+  { href: "/receipts", label: "Struk",  icon: Receipt },
+  { href: "/alerts",   label: "Alert",  icon: Bell },
+  { href: "/ledger",   label: "Ledger", icon: Shield },
 ];
 
 export function MobileNav() {
