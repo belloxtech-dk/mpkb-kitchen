@@ -20,10 +20,10 @@ export default async function LandingPage() {
       <section className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
         <div className="w-full max-w-md rounded-2xl border bg-panel/40 p-6">
           <h2 className="text-lg font-semibold tracking-tight">
-            {m.auth.signInTitle}
+            Masuk ke MPKB
           </h2>
           <p className="mt-1 mb-4 text-sm text-muted">
-            {m.auth.signInSubtitle}
+            Sistem Integritas Dapur MBG · SPPG Gamping, Yogyakarta
           </p>
           <LoginForm />
         </div>

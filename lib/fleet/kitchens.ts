@@ -13,13 +13,13 @@ export interface FleetKitchen {
   pilot?: boolean;
 }
 
-export const PILOT_KITCHEN_ID = 'lombok-percontohan';
+export const PILOT_KITCHEN_ID = 'gamping-yogyakarta';
 
 export const FLEET_KITCHENS: FleetKitchen[] = [
   {
     id: PILOT_KITCHEN_ID,
-    label: 'Dapur SPPG Percontohan · Lombok',
-    province: 'Nusa Tenggara Barat',
+    label: 'Dapur SPPG Gamping · Yogyakarta',
+    province: 'DI Yogyakarta',
     status: 'live',
     pilot: true,
   },
@@ -60,8 +60,8 @@ export const FLEET_KITCHENS: FleetKitchen[] = [
     status: 'locked',
   },
   {
-    id: 'yogyakarta-09',
-    label: 'SPPG 09 — Yogyakarta',
+    id: 'yogyakarta-sleman',
+    label: 'SPPG Sleman — Yogyakarta',
     province: 'DI Yogyakarta',
     status: 'locked',
   },

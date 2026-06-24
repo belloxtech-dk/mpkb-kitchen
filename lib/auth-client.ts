@@ -1,12 +1,12 @@
 "use client";
 
 import { createAuthClient } from "better-auth/react";
-import { adminClient, magicLinkClient } from "better-auth/client/plugins";
+import { adminClient } from "better-auth/client/plugins";
 import { ac, roles } from "@/lib/auth/permissions";
 
-/** Browser auth client. Mirrors the server plugins (magic link + admin roles). */
+/** Browser auth client. Email + password login. Admin roles. */
 export const authClient = createAuthClient({
-  plugins: [magicLinkClient(), adminClient({ ac, roles })],
+  plugins: [adminClient({ ac, roles })],
 });
 
 export const { signIn, signOut, useSession } = authClient;

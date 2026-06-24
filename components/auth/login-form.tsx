@@ -1,66 +1,87 @@
 "use client";
 
 import { useState } from "react";
-import { z } from "zod";
-import { CheckCircle2, Send } from "lucide-react";
-import { useMessages } from "@/lib/i18n/context";
+import { LogIn } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
-
-const EmailSchema = z.string().email();
+import { useRouter } from "next/navigation";
 
 export function LoginForm() {
-  const m = useMessages();
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const router = useRouter();
+  const [email, setEmail] = useState("andrea@openclaw.ai");
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!EmailSchema.safeParse(email).success) return;
-    setStatus("sending");
-    // Privacy-preserving: always show the generic "check your email" state,
-    // whether or not an invited account exists (invite-only + no enumeration).
+    setStatus("loading");
+    setErrorMsg("");
     try {
-      await authClient.signIn.magicLink({ email, callbackURL: "/" });
+      const res = await authClient.signIn.email({
+        email,
+        password,
+        callbackURL: "/",
+      });
+      if (res.error) {
+        setErrorMsg("Email atau password salah.");
+        setStatus("error");
+      } else {
+        router.push("/");
+        router.refresh();
+      }
     } catch {
-      /* swallow — don't reveal whether the address is registered */
+      setErrorMsg("Terjadi kesalahan. Coba lagi.");
+      setStatus("error");
     }
-    setStatus("sent");
   };
 
-  if (status === "sent") {
-    return (
-      <div className="rounded-xl border border-pass/30 bg-pass-soft p-4 text-center">
-        <CheckCircle2 className="mx-auto mb-1.5 size-6 text-pass" />
-        <div className="text-sm font-semibold text-pass">{m.auth.checkEmailTitle}</div>
-        <p className="mt-1 text-[13px] text-fg">{m.auth.checkEmailBody}</p>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={submit} className="space-y-3">
+    <form onSubmit={submit} className="space-y-4">
       <div>
         <label htmlFor="email" className="mb-1 block text-xs font-medium tracking-wide text-muted uppercase">
-          {m.auth.emailLabel}
+          Email
         </label>
         <input
           id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder={m.auth.emailPlaceholder}
+          placeholder="andrea@openclaw.ai"
           required
           autoComplete="email"
           className="w-full rounded-lg border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
         />
       </div>
+
+      <div>
+        <label htmlFor="password" className="mb-1 block text-xs font-medium tracking-wide text-muted uppercase">
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          required
+          autoComplete="current-password"
+          className="w-full rounded-lg border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+        />
+      </div>
+
+      {status === "error" && (
+        <p className="rounded-lg bg-fail-soft border border-fail/30 px-3 py-2 text-sm text-fail">
+          {errorMsg}
+        </p>
+      )}
+
       <button
         type="submit"
-        disabled={status === "sending"}
+        disabled={status === "loading"}
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 disabled:opacity-50"
       >
-        <Send className="size-4" />
-        {status === "sending" ? m.auth.sending : m.auth.sendLink}
+        <LogIn className="size-4" />
+        {status === "loading" ? "Masuk…" : "Masuk"}
       </button>
     </form>
   );
