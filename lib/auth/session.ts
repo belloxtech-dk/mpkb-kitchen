@@ -22,3 +22,4 @@ export async function requireAuth(): Promise<AppSession> {
   if (!session) throw new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   return session;
 }
+// deploy 1782390979
