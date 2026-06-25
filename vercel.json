@@ -1,5 +1,12 @@
 {
   "installCommand": "npm install",
   "buildCommand": "npm run build",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "functions": {
+    "app/api/cctv/streams/route.ts": { "maxDuration": 60 },
+    "app/api/cctv/proxy/route.ts":   { "maxDuration": 30 },
+    "app/api/cctv/auto-scan/route.ts": { "maxDuration": 60 },
+    "app/api/cctv/food-quality/route.ts": { "maxDuration": 60 },
+    "app/api/analyze/route.ts": { "maxDuration": 60 }
+  }
 }
