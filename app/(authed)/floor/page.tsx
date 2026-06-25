@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { KitchenProfile } from "@/components/kitchen-profile";
 import { CctvLive } from "@/components/cctv-live";
 import { FLEET_KITCHENS } from "@/lib/fleet/kitchens";
@@ -52,7 +54,7 @@ export default async function FloorPage({ searchParams }: Props) {
 
       {/* Main content */}
       <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-        <CctvLive kitchenId={kitchenId} />
+        <CctvLive key={kitchenId} kitchenId={kitchenId} />
         <aside className="space-y-4">
           <KitchenProfile cctvConnected={true} />
         </aside>
