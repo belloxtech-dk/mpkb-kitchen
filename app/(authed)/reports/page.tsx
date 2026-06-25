@@ -3,6 +3,7 @@ import { events, financeEvents, ledger } from "@/db/schema";
 import { desc, sql, gte } from "drizzle-orm";
 import { cn } from "@/lib/cn";
 import { PrintButton } from "./print-button";
+import { LiveScanPanel } from "@/components/live-scan-panel";
 
 /* ── Formatters ───────────────────────────────────────────────────── */
 function fmtIdr(n: number) {
@@ -146,6 +147,9 @@ export default async function ReportsPage() {
       `}</style>
 
       <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
+
+        {/* ── Live AI Scan ─────────────────────────────────────────── */}
+        <LiveScanPanel />
 
         {/* ── Report header ─────────────────────────────────────────── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

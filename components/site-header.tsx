@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LogOut, Menu, X, LayoutDashboard, Camera, BookOpen, Shield, Users, Bell, FileText, Receipt, Building2 } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { useMessages } from '@/lib/i18n/context';
+import { useMessages, useLocale, useSetLocale } from '@/lib/i18n/context';
+import { LOCALES, LOCALE_LABEL, type Locale } from '@/lib/i18n/locale';
 import { authClient } from '@/lib/auth-client';
 import { isAdmin, type Role } from '@/lib/auth/roles';
 
@@ -13,7 +14,11 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
   const pathname = usePathname();
   const router = useRouter();
   const m = useMessages();
+  const locale = useLocale();
+  const setLocale = useSetLocale();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const otherLocale: Locale = locale === 'en' ? 'id' : 'en';
 
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
@@ -76,6 +81,31 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2 ml-auto">
+          {/* Language switcher (EN / ID) */}
+          <div
+            role="group"
+            aria-label="Language"
+            className="hidden items-center rounded-lg border border-border bg-panel p-0.5 sm:flex"
+          >
+            {LOCALES.map((lc) => (
+              <button
+                key={lc}
+                type="button"
+                onClick={() => setLocale(lc)}
+                aria-pressed={locale === lc}
+                title={LOCALE_LABEL[lc]}
+                className={cn(
+                  'rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-wide transition',
+                  locale === lc
+                    ? 'bg-accent text-accent-fg shadow-sm shadow-accent/30'
+                    : 'text-muted hover:text-fg',
+                )}
+              >
+                {lc}
+              </button>
+            ))}
+          </div>
+
           {/* User pill */}
           <div className="hidden items-center gap-2 lg:flex">
             <div className="flex items-center gap-1.5 rounded-lg border border-border bg-panel px-2 py-1">
@@ -133,6 +163,20 @@ export function SiteHeader({ email, role }: { email: string; role: Role }) {
               );
             })}
           </nav>
+          {/* Language switcher (mobile) */}
+          <div className="mt-3 flex items-center gap-2 border-t border-border pt-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">
+              {locale === 'en' ? 'Language' : 'Bahasa'}
+            </span>
+            <button
+              type="button"
+              onClick={() => setLocale(otherLocale)}
+              className="flex items-center gap-1.5 rounded-lg border border-border bg-panel px-2.5 py-1 text-xs text-fg transition hover:border-accent/40"
+            >
+              {LOCALE_LABEL[otherLocale]}
+            </button>
+          </div>
+
           <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
             <div className="flex min-w-0 items-center gap-2">
               <span className="size-1.5 rounded-full bg-pass" />

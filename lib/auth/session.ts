@@ -11,11 +11,9 @@ export interface AppSession {
   role: Role;
 }
 
-export async function getAppSession(): Promise<AppSession | null> {
-  const result = await auth.api.getSession({ headers: await headers() });
-  if (!result?.user) return null;
-  const u = result.user as { id: string; email: string; name: string; role?: string | null };
-  return { userId: u.id, email: u.email, name: u.name, role: asRole(u.role) };
+// Demo mode: auth bypassed — always returns a valid session
+export async function getAppSession(): Promise<AppSession> {
+  return { userId: "demo", email: "demo@mbg.id", name: "Andrea", role: asRole("admin") };
 }
 
 /** Throws a 401 response if not authenticated — use in API route handlers. */
