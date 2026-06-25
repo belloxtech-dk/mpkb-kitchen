@@ -5,7 +5,7 @@
  * No API token needed — piggybacks on the existing browser session.
  */
 
-import { chromium } from "playwright-core";
+// playwright-core is macOS-only — dynamically imported at call time
 
 // Find Chrome/Chromium path on macOS
 function getChromePath(): string {
@@ -41,7 +41,7 @@ export async function sendViaWaWeb(phone: string, text: string): Promise<WaWebRe
 
   let browser;
   try {
-    // Launch Chrome with the user's profile (already logged into WA Web)
+    const { chromium } = await import("playwright-core");
     browser = await chromium.launchPersistentContext(USER_DATA_DIR, {
       executablePath: getChromePath(),
       headless: true,
@@ -90,6 +90,7 @@ export async function broadcastViaWaWeb(phones: string[], text: string): Promise
   const results: WaWebResult[] = [];
 
   try {
+    const { chromium } = await import("playwright-core");
     browser = await chromium.launchPersistentContext(USER_DATA_DIR, {
       executablePath: getChromePath(),
       headless: true,
