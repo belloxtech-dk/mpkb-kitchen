@@ -36,13 +36,15 @@ export function CctvLive({ kitchenId }: { kitchenId?: string }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [kitchenId]);
 
   useEffect(() => {
+    setLoading(true);
+    setStreams([]);
     fetchStreams();
     const interval = setInterval(fetchStreams, REFRESH_MS);
     return () => clearInterval(interval);
-  }, [fetchStreams, kitchenId]);
+  }, [fetchStreams]);
 
   if (loading) {
     return (
