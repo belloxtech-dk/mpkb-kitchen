@@ -47,7 +47,15 @@ async function apiCall(endpoint: string, params: Record<string, unknown>, token:
 
 export const dynamic = "force-dynamic";
 
+/** Wrap HTTP HLS URL in proxy for HTTPS sites (avoids mixed-content block). */
+function proxyHls(hls: string | null, origin: string): string | null {
+  if (!hls) return null;
+  if (hls.startsWith("https")) return hls; // already HTTPS
+  return `${origin}/api/cctv/proxy?url=${encodeURIComponent(hls)}`;
+}
+
 export async function GET(req: NextRequest) {
+  const origin = req.nextUrl.origin;
   const kitchenId = req.nextUrl.searchParams.get("kitchen");
 
   try {
@@ -75,13 +83,14 @@ export async function GET(req: NextRequest) {
         const arr = r.result?.data?.streams as S[] | undefined;
         const preferred = arr?.find(s => s.streamId === 1) ?? arr?.[0];
 
+        const rawHls = preferred?.hls ?? null;
         return {
           name: cam.name,
           deviceId: cam.deviceId,
           kitchenId: cam.kitchenId,
           zone: cam.zone,
           status: r.result?.code === "0" ? "online" : "offline",
-          hls: preferred?.hls ?? null,
+          hls: proxyHls(rawHls, origin),
         };
       })
     );
