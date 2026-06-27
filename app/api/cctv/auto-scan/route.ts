@@ -1,20 +1,28 @@
 /**
  * POST /api/cctv/auto-scan
  * Triggers a full AI SOP scan across all kitchen cameras.
- * Sends WhatsApp report to configured recipients.
- * Can be called manually from dashboard or by an external cron.
+ * POST only — no GET to prevent accidental browser triggers.
+ * Requires secret header to prevent unauthorized calls.
  */
 import { NextResponse } from "next/server";
 import { runAutoScan } from "@/lib/auto-scan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 120; // 2 min — Claude + multi-camera
+export const maxDuration = 120;
 
-export async function POST() {
+const SCAN_SECRET = process.env.AUTO_SCAN_SECRET ?? "";
+
+export async function POST(req: Request) {
+  // Block if no secret configured or wrong secret
+  const auth = req.headers.get("x-scan-secret");
+  if (!SCAN_SECRET || auth !== SCAN_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Rate limit: check last scan time via header
   try {
     const { results, waDelivered } = await runAutoScan();
-
     const summary = {
       scanned: results.length,
       online: results.filter(r => r.status !== "offline").length,
@@ -29,15 +37,9 @@ export async function POST() {
       waDelivered,
       results,
     };
-
     return NextResponse.json({ ok: true, ...summary });
   } catch (err) {
     console.error("Auto-scan error:", err);
     return NextResponse.json({ ok: false, error: String(err) }, { status: 500 });
   }
-}
-
-// Allow GET for easy browser testing
-export async function GET() {
-  return POST();
 }
