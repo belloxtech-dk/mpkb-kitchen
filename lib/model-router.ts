@@ -1,25 +1,21 @@
 /**
- * Smart model router — Gemini first, Ollama fallback, Sonnet only when critical.
+ * Smart model router — Ollama first (free), Claude only for critical escalations.
  *
- * COST ORDER (cheapest → most expensive):
- *   Ollama (qwen2.5vl:7b) → FREE  (local, vision capable)
- *   Gemini Flash 2.0      → ~$0.01/1K tokens (vision, fast)
- *   Gemini Pro 1.5        → ~$0.07/1K tokens (better reasoning)
- *   Claude Sonnet         → ~$3/1K tokens    (ONLY for critical tasks)
- *
- * Default: Gemini Flash for almost everything.
+ * COST ORDER:
+ *   Ollama (qwen2.5vl:7b) → FREE  (local vision)
+ *   Gemini Flash          → ~$0.01/1K (fallback)
+ *   Claude Sonnet         → ~$3/1K    (ONLY critical violations)
  */
 
 import Anthropic from "@anthropic-ai/sdk";
 
-const OLLAMA_BASE  = process.env.OLLAMA_BASE_URL ?? "http://127.0.0.1:11434";
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL    ?? "qwen2.5vl:7b";
-const GEMINI_KEY   = process.env.GEMINI_API_KEY ?? "";
+const OLLAMA_BASE   = process.env.OLLAMA_BASE_URL  ?? "http://127.0.0.1:11434";
+const OLLAMA_MODEL  = process.env.OLLAMA_MODEL     ?? "qwen2.5vl:7b";
+const GEMINI_KEY    = process.env.GEMINI_API_KEY   ?? "";
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY ?? "";
 
-const HAS_GEMINI    = Boolean(GEMINI_KEY && !["", "dummy"].includes(GEMINI_KEY));
+const HAS_GEMINI    = Boolean(GEMINI_KEY    && !["", "dummy"].includes(GEMINI_KEY));
 const HAS_ANTHROPIC = Boolean(ANTHROPIC_KEY && !["", "dummy"].includes(ANTHROPIC_KEY));
-const HAS_OLLAMA    = process.platform === "darwin"; // local only
 
 export type TaskTier = "free" | "cheap" | "quality" | "critical";
 
@@ -56,59 +52,43 @@ function anthropicClient(): ModelChoice {
   };
 }
 
-/**
- * Pick cheapest capable model for the tier.
- *
- * free     → Ollama (local) or Gemini Flash
- * cheap    → Gemini Flash
- * quality  → Gemini Flash (good enough for most vision)
- * critical → Gemini Pro, fallback Sonnet only if no Gemini
- */
 export function pickModel(tier: TaskTier): ModelChoice {
   switch (tier) {
     case "free":
-      if (HAS_OLLAMA) return ollamaClient();
-      if (HAS_GEMINI) return geminiClient(true);
-      return ollamaClient(); // best-effort
-
     case "cheap":
-    case "quality":   // Gemini Flash handles vision well
-      if (HAS_GEMINI) return geminiClient(true);
-      if (HAS_OLLAMA) return ollamaClient();
-      if (HAS_ANTHROPIC) return anthropicClient();
+    case "quality":
+      // Always try Ollama first — it's free and runs locally
       return ollamaClient();
 
-    case "critical":  // Only for final SOP audit reports
-      if (HAS_GEMINI) return geminiClient(false); // Gemini Pro
-      if (HAS_ANTHROPIC) return anthropicClient(); // Last resort
-      if (HAS_OLLAMA) return ollamaClient();
+    case "critical":
+      // Critical violations only — Claude as last resort
+      if (HAS_GEMINI)    return geminiClient(false);
+      if (HAS_ANTHROPIC) return anthropicClient();
       return ollamaClient();
   }
 }
 
-// Task → tier mapping (keep Sonnet out unless truly needed)
 export const TASK_TIERS: Record<string, TaskTier> = {
-  food_count:        "free",     // Ollama: count numbers
-  presence_check:    "free",     // Ollama: is person there?
-  food_quality:      "cheap",    // Gemini Flash: vision
-  quantity_estimate: "cheap",    // Gemini Flash: vision
-  receipt_ocr:       "cheap",    // Gemini Flash: OCR
-  sop_audit:         "quality",  // Gemini Flash: SOP check
-  finance_analysis:  "quality",  // Gemini Flash: math/text
-  report_generation: "quality",  // Gemini Flash: writing
-  full_audit:        "critical", // Gemini Pro: deep reasoning
+  food_count:        "free",     // Ollama
+  presence_check:    "free",     // Ollama
+  food_quality:      "free",     // Ollama
+  quantity_estimate: "free",     // Ollama
+  receipt_ocr:       "free",     // Ollama
+  sop_audit:         "free",     // Ollama — was "quality" = $$$
+  finance_analysis:  "cheap",    // Ollama
+  report_generation: "cheap",    // Ollama
+  full_audit:        "critical", // Claude only for critical escalations
 };
 
 export function getModelForTask(task: keyof typeof TASK_TIERS): ModelChoice {
-  return pickModel(TASK_TIERS[task] ?? "cheap");
+  return pickModel(TASK_TIERS[task] ?? "free");
 }
 
-// Compatibility shim for old code that calls getModel()
 export async function getModel(): Promise<string> {
-  return pickModel("quality").model;
+  return pickModel("free").model;
 }
 
 export type TaskComplexity = "simple" | "medium" | "heavy";
 export function pickModelByComplexity(c: TaskComplexity): ModelChoice {
-  return pickModel(c === "simple" ? "free" : c === "medium" ? "cheap" : "quality");
+  return pickModel(c === "heavy" ? "critical" : "free");
 }
